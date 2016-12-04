@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1478804364 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\getbmp.cpp
+	<fstream>
+	"getbmp.h"
+
+1478804364 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\getbmp.h
+
