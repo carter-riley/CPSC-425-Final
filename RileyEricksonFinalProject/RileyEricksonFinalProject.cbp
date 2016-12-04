@@ -8,12 +8,12 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="bin/Debug/RileyEricksonFinalProject" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="C:/MinGW/bin" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="../../glm" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -43,7 +43,12 @@
 			<Add library="gdi32" />
 			<Add directory="C:/MinGW/lib" />
 		</Linker>
+		<Unit filename="getbmp.cpp" />
+		<Unit filename="getbmp.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="shader.cpp" />
+		<Unit filename="shader.h" />
+		<Unit filename="vertex.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
