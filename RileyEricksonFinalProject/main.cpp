@@ -128,8 +128,8 @@ void setup(void)
    objectLoc = glGetUniformLocation(programId, "object");
 
    // Load the images.
-   image[0] = getbmp("grass.bmp");
-   image[1] = getbmp("sky.bmp");
+   image[0] = getbmp("grass1.bmp");
+   image[1] = getbmp("sky1.bmp");
 
    // Create texture ids.
    glGenTextures(2, texture);
