@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////////
-// fieldAndSkyFilteredShaderized.cpp
+// RileyEricksonFinalProject
 //
 // Forward-compatible core GL 4.3 version of fieldAndSkyFiltered.cpp (except only
 // one filter is implemented).
