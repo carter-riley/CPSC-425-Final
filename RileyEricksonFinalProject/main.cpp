@@ -203,20 +203,20 @@ void drawScene(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   // Calculate and update modelview matrix.
-   modelViewMat = mat4(1.0);
-   modelViewMat = lookAt(vec3(0.0, 10.0, 15.0 + d), vec3(0.0, 10.0, 0.0), vec3(0.0, 1.0, 0.0));
-   /*(xVal - 10 * sin( (PI / 180.0) * angle),
-              0.0,
-              zVal - 10 * cos( (PI / 180.0) * angle),
-              xVal - 11 * sin( (PI / 180.0) * angle),
-              0.0,
-              zVal - 11 * cos( (PI / 180.0) * angle),
-              0.0,
-              1.0,
-              0.0);
-   */
-   glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    // Calculate and update modelview matrix.
+    modelViewMat = mat4(1.0);
+    modelViewMat = lookAt(vec3(0.0, 10.0, 15.0 + d), vec3(0.0, 10.0, 0.0), vec3(0.0, 1.0, 0.0));
+    /*(xVal - 10 * sin( (PI / 180.0) * angle),
+               0.0,
+               zVal - 10 * cos( (PI / 180.0) * angle),
+               xVal - 11 * sin( (PI / 180.0) * angle),
+               0.0,
+               zVal - 11 * cos( (PI / 180.0) * angle),
+               0.0,
+               1.0,
+               0.0);
+    */
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     // Draw field.
     glUniform1ui(objectLoc, FIELD);
@@ -253,54 +253,54 @@ void keyInput(unsigned char key, int x, int y)
 // Callback routine for non-ASCII key entry.
 void specialKeyInput(int key, int x, int y)
 {
-   if (key == GLUT_KEY_UP)
-   {
-      if (d > -50.0) d -= 0.1;
-   }
-   if (key == GLUT_KEY_DOWN)
-   {
-      if (d < 15.0) d += 0.1;
-   }
-   glutPostRedisplay();
-
-   /*
-   void specialKeyInput(int key, int x, int y)
-{
-    float tempxVal = xVal, tempzVal = zVal, tempAngle = angle;
-
-    // Compute next position.
-    if (key == GLUT_KEY_LEFT) tempAngle = angle + 5.0;
-    if (key == GLUT_KEY_RIGHT) tempAngle = angle - 5.0;
-    if( key == GLUT_KEY_UP)
+    if (key == GLUT_KEY_UP)
     {
-        tempxVal = xVal - sin(angle * PI / 180.0);
-        tempzVal = zVal - cos(angle * PI / 180.0);
+        if (d > -50.0) d -= 0.1;
     }
-    if( key == GLUT_KEY_DOWN)
+    if (key == GLUT_KEY_DOWN)
     {
-        tempxVal = xVal + sin(angle * PI / 180.0);
-        tempzVal = zVal + cos(angle * PI / 180.0);
+        if (d < 15.0) d += 0.1;
     }
-
-    // Angle correction.
-    if (tempAngle > 360.0) tempAngle -= 360.0;
-    if (tempAngle < 0.0) tempAngle += 360.0;
-
-    // Move spacecraft to next position only if there will not be collision with an asteroid.
-    if (!asteroidCraftCollision(tempxVal, tempzVal, tempAngle, false) )
-    {
-        isCollision = 0;
-        xVal = tempxVal;
-        zVal = tempzVal;
-        angle = tempAngle;
-    }
-    else isCollision = true;
-
     glutPostRedisplay();
-    */
-}
-}
 
+/*
+    void specialKeyInput(int key, int x, int y)
+    {
+        float tempxVal = xVal, tempzVal = zVal, tempAngle = angle;
+
+        // Compute next position.
+        if (key == GLUT_KEY_LEFT) tempAngle = angle + 5.0;
+        if (key == GLUT_KEY_RIGHT) tempAngle = angle - 5.0;
+        if( key == GLUT_KEY_UP)
+        {
+            tempxVal = xVal - sin(angle * PI / 180.0);
+            tempzVal = zVal - cos(angle * PI / 180.0);
+        }
+        if( key == GLUT_KEY_DOWN)
+        {
+            tempxVal = xVal + sin(angle * PI / 180.0);
+            tempzVal = zVal + cos(angle * PI / 180.0);
+        }
+
+        // Angle correction.
+        if (tempAngle > 360.0) tempAngle -= 360.0;
+        if (tempAngle < 0.0) tempAngle += 360.0;
+
+        // Move spacecraft to next position only if there will not be collision with an asteroid.
+        if (!asteroidCraftCollision(tempxVal, tempzVal, tempAngle, false) )
+        {
+            isCollision = 0;
+            xVal = tempxVal;
+            zVal = tempzVal;
+            angle = tempAngle;
+        }
+        else isCollision = true;
+
+        glutPostRedisplay();
+
+    }
+}
+*/
 /*
 void
 mouse( GLint button, GLint state, GLint x, GLint y )
@@ -377,7 +377,7 @@ void tumble(mat4 rx, mat4 ry, vec4 tumblePoint)
     eye = -(rotInverse * newView * vec4(0,0,0,1));
 
     viewRotation = newView;
-    viewRotation[0][3] = 0;
+    viewRileyEricksonFinalProject/bin/Debug/RileyEricksonFinalProject.exewRotation[0][3] = 0;
     viewRotation[1][3] = 0;
     viewRotation[2][3] = 0;
     viewRotation[3][3] = 1;
@@ -437,10 +437,9 @@ motion( GLint x, GLint y )
     default:
         printf("unknown action %d\n", action);
     }
-
+*/
     glutPostRedisplay();
 }
-*/
 
 // Routine to output interaction instructions to the C++ window.
 void printInteraction(void)
