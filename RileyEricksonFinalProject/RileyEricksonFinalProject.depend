@@ -5,7 +5,7 @@
 
 1480969387 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\getbmp.h
 
-1480909884 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\main.cpp
+1480977343 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
@@ -783,7 +783,7 @@
 
 1480969387 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\shader.h
 
-1478804367 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\vertex.h
+1480969387 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\vertex.h
 	<glm/glm.hpp>
 
 1480969387 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\shader.cpp
