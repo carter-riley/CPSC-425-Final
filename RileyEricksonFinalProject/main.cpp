@@ -48,6 +48,9 @@ void drawSky(void);
 void setupShaders(void);
 
 
+int width = 800;
+int height = 800;
+
 // Globals.
 static Vertex fieldVertices[4] =
 {
@@ -102,6 +105,9 @@ static Vertex skyVerticesT[4] =
 static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
 
+int lookX = 0, lookY = 0;
+int posX = 0, posZ = 0;
+
 static unsigned int
 programId,
 vertexShaderId,
@@ -117,6 +123,7 @@ texture[2];
 
 static BitMapFile *image[6]; // Local storage for bmp image data.
 
+<<<<<<< HEAD
 static float d = 0.0; // Distance parameter in gluLookAt().
 
 
@@ -187,11 +194,111 @@ void setup(void)
 
     skyTexLoc = glGetUniformLocation(programId, "skyTex");
     glUniform1i(skyTexLoc, 1);
+=======
+// Initialization routine.
+void setup(void)
+{
+   glClearColor(0.0, 0.0, 0.0, 0.0);
+   glEnable(GL_DEPTH_TEST);
+
+   // Create shader program executable.
+   vertexShaderId = setShader("vertex", "vertexShader.glsl");
+   fragmentShaderId = setShader("fragment", "fragmentShader.glsl");
+   programId = glCreateProgram();
+   glAttachShader(programId, vertexShaderId);
+   glAttachShader(programId, fragmentShaderId);
+   glLinkProgram(programId);
+   glUseProgram(programId);
+
+   // Create VAOs and VBOs...
+   glGenVertexArrays(2, vao);
+   glGenBuffers(2, buffer);
+
+   // ...and associate data with vertex shader.
+   glBindVertexArray(vao[FIELD]);
+   glBindBuffer(GL_ARRAY_BUFFER, buffer[FIELD_VERTICES]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(fieldVertices), fieldVertices, GL_STATIC_DRAW);
+   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(fieldVertices[0]), 0);
+   glEnableVertexAttribArray(0);
+   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(fieldVertices[0]), (void*)(sizeof(fieldVertices[0].coords)));
+   glEnableVertexAttribArray(1);
+
+   // ...and associate data with vertex shader.
+   glBindVertexArray(vao[SKY]);
+   glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES]);
+   glBufferData(GL_ARRAY_BUFFER, sizeof(skyVertices), skyVertices, GL_STATIC_DRAW);
+   glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), 0);
+   glEnableVertexAttribArray(2);
+   glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)(sizeof(skyVertices[0].coords)));
+   glEnableVertexAttribArray(3);
+
+   // Obtain projection matrix uniform location and set value.
+   projMatLoc = glGetUniformLocation(programId,"projMat");
+   projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 1000.0);
+   glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
+
+   // Obtain modelview matrix uniform and object uniform locations.
+   modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
+   objectLoc = glGetUniformLocation(programId, "object");
+
+   // Load the images.
+   image[0] = getbmp("grass1.bmp");
+   image[1] = getbmp("sky1.bmp");
+
+   // Create texture ids.
+   glGenTextures(2, texture);
+
+   // Bind grass image.
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, texture[0]);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[0]->sizeX, image[0]->sizeY, 0,
+	            GL_RGBA, GL_UNSIGNED_BYTE, image[0]->data);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+   // try different filtering techniques
+
+   // option 1
+   /*
+   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+   */
+
+   // option 2
+   /*
+   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+   */
+
+   // OPTION 3
+
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glGenerateMipmap(GL_TEXTURE_2D);
+
+
+   grassTexLoc = glGetUniformLocation(programId, "grassTex");
+   glUniform1i(grassTexLoc, 0);
+
+   // Bind sky image.
+   glActiveTexture(GL_TEXTURE1);
+   glBindTexture(GL_TEXTURE_2D, texture[1]);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[1]->sizeX, image[1]->sizeY, 0,
+	            GL_RGBA, GL_UNSIGNED_BYTE, image[1]->data);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   skyTexLoc = glGetUniformLocation(programId, "skyTex");
+   skyTexLoc = glGetUniformLocation(programId, "skyTex");
+   glUniform1i(skyTexLoc, 1);
+>>>>>>> refs/remotes/origin/Carter-Branch
 }
 
 // Drawing routine.
 void drawScene(void)
 {
+<<<<<<< HEAD
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate and update modelview matrix.
@@ -300,6 +407,33 @@ void setupShaders(void)
     glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesT[0]), (void*)(sizeof(skyVerticesT[0].coords)));
     glEnableVertexAttribArray(11);
 
+=======
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+   // Calculate and update modelview matrix.
+   modelViewMat = mat4(1.0);
+   modelViewMat = lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
+
+   /*LookAt(
+            vec3(xVal - 10 * sin( (PI / 180.0) * angle), 0.0, zVal - 10 * cos( (PI / 180.0) * angle)),
+            vec3( xVal - 11 * sin( (PI / 180.0) * angle), 0.0, zVal - 11 * cos( (PI / 180.0) * angle)),
+            vec3(0.0, 1.0, 0.0);
+
+   */
+   glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+
+   // Draw field.
+   glUniform1ui(objectLoc, FIELD);
+   glBindVertexArray(vao[FIELD]);
+   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+   // Draw sky.
+   glUniform1ui(objectLoc, SKY);
+   glBindVertexArray(vao[SKY]);
+   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+   glutSwapBuffers();
+>>>>>>> refs/remotes/origin/Carter-Branch
 }
 
 void drawSky(void)
@@ -316,6 +450,7 @@ void resize(int w, int h)
 // Keyboard input processing routine.
 void keyInput(unsigned char key, int x, int y)
 {
+<<<<<<< HEAD
     switch(key)
     {
     case 27:
@@ -324,11 +459,35 @@ void keyInput(unsigned char key, int x, int y)
     default:
         break;
     }
+=======
+   switch(key)
+   {
+      case 'w':
+        posZ -= 1;
+        break;
+      case 'a':
+        posX -= 1;
+        break;
+      case 's':
+        posZ += 1;
+        break;
+      case 'd':
+        posX += 1;
+        break;
+      case 27:
+         exit(0);
+         break;
+      default:
+         break;
+   }
+   glutPostRedisplay();
+>>>>>>> refs/remotes/origin/Carter-Branch
 }
 
 // Callback routine for non-ASCII key entry.
 void specialKeyInput(int key, int x, int y)
 {
+<<<<<<< HEAD
     if (key == GLUT_KEY_UP)
     {
         if (d > -50.0) d -= 0.1;
@@ -514,6 +673,19 @@ motion( GLint x, GLint y )
         printf("unknown action %d\n", action);
     }
 */
+=======
+   glutPostRedisplay();
+}
+
+void mouse( GLint button, GLint state, GLint x, GLint y )
+{
+    //glutWarpPointer(width /2 ,height /2); //To warp the cursor to a screen position
+    //glutSetCursor(GLUT_CURSOR_NONE); //To hide the cursor
+    //cout << "x = " << x << ", y = " << y << endl;
+    lookX = x - (width / 2);
+    lookY = y - (height / 2);
+    //cout << "lookX = " << lookX << ", lookY = " << lookY << endl;
+>>>>>>> refs/remotes/origin/Carter-Branch
     glutPostRedisplay();
 }
 
@@ -534,6 +706,7 @@ int main(int argc, char **argv)
     glutInitContextProfile(GLUT_CORE_PROFILE);
     glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 
+<<<<<<< HEAD
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(500, 500);
     glutInitWindowPosition(100, 100);
@@ -542,6 +715,17 @@ int main(int argc, char **argv)
     glutReshapeFunc(resize);
     glutKeyboardFunc(keyInput);
     glutSpecialFunc(specialKeyInput);
+=======
+   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+   glutInitWindowSize(width, height);
+   glutInitWindowPosition(0,0);
+   glutCreateWindow("a field and a sky");
+   glutDisplayFunc(drawScene);
+   glutReshapeFunc(resize);
+   glutMouseFunc(mouse);
+   glutKeyboardFunc(keyInput);
+   glutSpecialFunc(specialKeyInput);
+>>>>>>> refs/remotes/origin/Carter-Branch
 
     glewExperimental = GL_TRUE;
     glewInit();
@@ -550,4 +734,3 @@ int main(int argc, char **argv)
 
     glutMainLoop();
 }
-
