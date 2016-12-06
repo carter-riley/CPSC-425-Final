@@ -44,8 +44,8 @@ using namespace std;
 using namespace std;
 using namespace glm;
 
-enum object {FIELD, SKY_F, SKY_B, SKY_R, SKY_L, SKY_T}; // VAO ids.
-enum buffer {FIELD_VERTICES, SKY_VERTICES_F, SKY_VERTICES_B, SKY_VERTICES_R, SKY_VERTICES_L, SKY_VERTICES_T }; // VBO ids.
+enum object {FIELD, SKY}; // VAO ids.
+enum buffer {FIELD_VERTICES, SKY_VERTICES }; // VBO ids.
 
 void setupShaders(void);
 
@@ -60,57 +60,14 @@ static Vertex fieldVertices[4] =
     {vec4(100.0, 0.0, -100.0, 1.0), vec2(40.0, 40.0)},
     {vec4(-100.0, 0.0, 100.0, 1.0), vec2(0.0, 0.0)},
     {vec4(-100.0, 0.0, -100.0, 1.0), vec2(0.0, 40.0)}
-<<<<<<< HEAD
-=======
 };
 
-
-static Vertex skyVerticesF[4] =
+static Vertex skyVertices[4] =
 {
-    {vec4(100.0, 0.0, -100.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 120.0, -100.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, 0.0, -100.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 120.0, -100.0, 1.0), vec2(0.0, 1.0)}
-};
-
-static Vertex skyVerticesL[4] =
-{
-    {vec4(-100.0, 0.0, -100.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(-100.0, 120.0, -100.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, 0.0, 100.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 120.0, 100.0, 1.0), vec2(0.0, 1.0)}
-};
-
-static Vertex skyVerticesB[4] =
-{
-    {vec4(-100.0, 0.0, 100.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(-100.0, 120.0, 100.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(100.0, 0.0, 100.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(100.0, 120.0, 100.0, 1.0), vec2(0.0, 1.0)}
-};
-
-static Vertex skyVerticesR[4] =
-{
-    {vec4(100.0, 0.0, 100.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 120.0, 100.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(100.0, 0.0, -100.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(100.0, 120.0, -100.0, 1.0), vec2(0.0, 1.0)}
->>>>>>> refs/remotes/origin/master
-};
-
-static Vertex skyVerticesT[4] =
-{
-<<<<<<< HEAD
     {vec4(100.0, -100.0, -100.0, 1.0), vec2(1.0, 0.0)},
     {vec4(100.0, 100.0, -100.0, 1.0), vec2(1.0, 1.0)},
     {vec4(-100.0, -100.0, -100.0, 1.0), vec2(0.0, 0.0)},
     {vec4(-100.0, 100.0, -100.0, 1.0), vec2(0.0, 1.0)}
-=======
-    {vec4(100.0, 120.0, 100.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 120.0, -100.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, 120.0, 100.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 120.0, -100.0, 1.0), vec2(0.0, 1.0)}
->>>>>>> refs/remotes/origin/master
 };
 
 
@@ -131,7 +88,6 @@ modelViewMatLoc,
 projMatLoc,
 grassTexLoc,
 skyTexLoc,
-<<<<<<< HEAD
 sky1TexLoc,
 objectLoc,
 buffer[2],
@@ -150,26 +106,10 @@ void printControls()
     cout << "Esc ............... quit" << "\n";
 
 }
-=======
-objectLoc,
-buffer[6],
-vao[6],
-texture[2];
-
-static BitMapFile *image[6]; // Local storage for bmp image data.
-
-static float d = 0.0; // Distance parameter in gluLookAt().
-
->>>>>>> refs/remotes/origin/master
 
 // Initialization routine.
 void setup(void)
 {
-<<<<<<< HEAD
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-=======
-    glClearColor(1.0, 1.0, 1.0, 0.0);
->>>>>>> refs/remotes/origin/master
     glEnable(GL_DEPTH_TEST);
 
     // Create shader program executable.
@@ -182,7 +122,6 @@ void setup(void)
     glUseProgram(programId);
 
     // Create VAOs and VBOs...
-<<<<<<< HEAD
     glGenVertexArrays(2, vao);
     glGenBuffers(2, buffer);
 
@@ -203,13 +142,6 @@ void setup(void)
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)(sizeof(skyVertices[0].coords)));
     glEnableVertexAttribArray(3);
-=======
-    glGenVertexArrays(6, vao);
-    glGenBuffers(6, buffer);
-
-    // ...and associate data with vertex shader.
-    setupShaders();
->>>>>>> refs/remotes/origin/master
 
     // Obtain projection matrix uniform location and set value.
     projMatLoc = glGetUniformLocation(programId,"projMat");
@@ -222,7 +154,6 @@ void setup(void)
 
     // Load the images.
     image[0] = getbmp("grass1.bmp");
-<<<<<<< HEAD
     image[1] = getbmp("front.bmp");
     image[2] = getbmp("back.bmp");
     image[3] = getbmp("left.bmp");
@@ -231,12 +162,6 @@ void setup(void)
     image[6] = getbmp("bottom.bmp");
     // Create texture ids.
     glGenTextures(6, texture);
-=======
-    image[1] = getbmp("sky1.bmp");
-
-    // Create texture ids.
-    glGenTextures(2, texture);
->>>>>>> refs/remotes/origin/master
 
     // Bind grass image.
     glActiveTexture(GL_TEXTURE0);
@@ -245,25 +170,17 @@ void setup(void)
                  GL_RGBA, GL_UNSIGNED_BYTE, image[0]->data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-<<<<<<< HEAD
-    // Use mipmap texture filtering.
-=======
     grassTexLoc = glGetUniformLocation(programId, "grassTex");
     glUniform1i(grassTexLoc, 0);
 
     // Filter using mipmap
->>>>>>> refs/remotes/origin/master
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-<<<<<<< HEAD
     grassTexLoc = glGetUniformLocation(programId, "grassTex");
     glUniform1i(grassTexLoc, 0);
 
-=======
->>>>>>> refs/remotes/origin/master
     // Bind sky image.
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture[1]);
@@ -273,7 +190,6 @@ void setup(void)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-<<<<<<< HEAD
     skyTexLoc = glGetUniformLocation(programId, "skyTex");
     glUniform1i(skyTexLoc, 1);
 
@@ -289,12 +205,6 @@ void setup(void)
     sky1TexLoc = glGetUniformLocation(programId, "sky1Tex");
     glUniform1i(sky1TexLoc, 2);
     printControls();
-=======
-
-
-    skyTexLoc = glGetUniformLocation(programId, "skyTex");
-    glUniform1i(skyTexLoc, 1);
->>>>>>> refs/remotes/origin/master
 }
 
 // Drawing routine.
@@ -303,7 +213,6 @@ void drawScene(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate and update modelview matrix.
-<<<<<<< HEAD
     modelViewMat = mat4(1.0);
     //modelViewMat = lookAt(vec3(posX - 10 * sin( (PI / 180.0)), 10.0, posZ + 5 * cos( (PI / 180.0))), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
     modelViewMat = lookAt(vec3(xVal - 10 * sin( (PI / 180.0) * vertexAngle),10.0,zVal - 10 * cos( (PI / 180.0) * vertexAngle)), vec3((-lookX*0.01)*(xVal - 11 * sin( (PI / 180.0) * vertexAngle)), (-lookY*0.01) + 10.0,zVal - 11 * cos( (PI / 180.0) * vertexAngle)),vec3(0.0, 1.0,0.0));
@@ -319,18 +228,6 @@ void drawScene(void)
                0.0);
      lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
     */
-=======
-   modelViewMat = mat4(1.0);
-   modelViewMat = lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
-
-   /*LookAt(
-            vec3(xVal - 10 * sin( (PI / 180.0) * angle), 0.0, zVal - 10 * cos( (PI / 180.0) * angle)),
-            vec3( xVal - 11 * sin( (PI / 180.0) * angle), 0.0, zVal - 11 * cos( (PI / 180.0) * angle)),
-            vec3(0.0, 1.0, 0.0);
-
-   */
-
->>>>>>> refs/remotes/origin/master
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     // Draw field.
@@ -338,13 +235,13 @@ void drawScene(void)
     glBindVertexArray(vao[FIELD]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-<<<<<<< HEAD
     GLfloat angle = 90.0;
     // Draw sky.
 
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    modelViewMat = rotate(modelViewMat, angle, vec3(0.0, 1.0, 0.0));
 
     modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 200.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
@@ -353,7 +250,6 @@ void drawScene(void)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     modelViewMat = translate(modelViewMat, vec3(100.0, 0.0, 0.0));
-    modelViewMat = rotate(modelViewMat, angle, vec3(0.0, 1.0, 0.0));
     modelViewMat = translate(modelViewMat, vec3(-100.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
     glUniform1ui(objectLoc, SKY);
@@ -369,93 +265,6 @@ void drawScene(void)
 //    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glutSwapBuffers();
-=======
-
-    // Draw sky.
-
-    // Front
-    glUniform1ui(objectLoc, SKY_F);
-    glBindVertexArray(vao[SKY_F]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    // Back
-    glUniform1ui(objectLoc, SKY_B);
-    glBindVertexArray(vao[SKY_B]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    // Right
-    glUniform1ui(objectLoc, SKY_R);
-    glBindVertexArray(vao[SKY_R]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    // Left
-    glUniform1ui(objectLoc, SKY_L);
-    glBindVertexArray(vao[SKY_L]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    // Top
-    glUniform1ui(objectLoc, SKY_T);
-    glBindVertexArray(vao[SKY_T]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    glutSwapBuffers();
-}
-
-void setupShaders(void)
-{
-    glBindVertexArray(vao[FIELD]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[FIELD_VERTICES]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(fieldVertices), fieldVertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(fieldVertices[0]), 0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(fieldVertices[0]), (void*)(sizeof(fieldVertices[0].coords)));
-    glEnableVertexAttribArray(1);
-
-    // Front of skybox
-    glBindVertexArray(vao[SKY_F]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES_F]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyVerticesF), skyVerticesF, GL_STATIC_DRAW);
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(skyVerticesF[0]), 0);
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesF[0]), (void*)(sizeof(skyVerticesF[0].coords)));
-    glEnableVertexAttribArray(3);
-
-    // Back of skybox
-    glBindVertexArray(vao[SKY_B]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES_B]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyVerticesB), skyVerticesB, GL_STATIC_DRAW);
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(skyVerticesB[0]), 0);
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesB[0]), (void*)(sizeof(skyVerticesB[0].coords)));
-    glEnableVertexAttribArray(5);
-
-    // Right of skybox
-    glBindVertexArray(vao[SKY_R]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES_R]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyVerticesR), skyVerticesR, GL_STATIC_DRAW);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(skyVerticesR[0]), 0);
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(7, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesR[0]), (void*)(sizeof(skyVerticesR[0].coords)));
-    glEnableVertexAttribArray(7);
-
-    // Left of skybox
-    glBindVertexArray(vao[SKY_L]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES_L]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyVerticesL), skyVerticesL, GL_STATIC_DRAW);
-    glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(skyVerticesL[0]), 0);
-    glEnableVertexAttribArray(8);
-    glVertexAttribPointer(9, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesL[0]), (void*)(sizeof(skyVerticesL[0].coords)));
-    glEnableVertexAttribArray(9);
-
-    // Top of skybox
-    glBindVertexArray(vao[SKY_T]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES_T]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(skyVerticesT), skyVerticesT, GL_STATIC_DRAW);
-    glVertexAttribPointer(10, 4, GL_FLOAT, GL_FALSE, sizeof(skyVerticesT[0]), 0);
-    glEnableVertexAttribArray(10);
-    glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesT[0]), (void*)(sizeof(skyVerticesT[0].coords)));
-    glEnableVertexAttribArray(11);
->>>>>>> refs/remotes/origin/master
 }
 
 // OpenGL window reshape routine.
@@ -534,7 +343,6 @@ int main(int argc, char **argv)
     printInteraction();
     glutInit(&argc, argv);
 
-<<<<<<< HEAD
     glutInitContextVersion(4, 3);
     glutInitContextProfile(GLUT_CORE_PROFILE);
     glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
@@ -552,24 +360,7 @@ int main(int argc, char **argv)
     glewExperimental = GL_TRUE;
     glewInit();
 
-=======
-    glutInitContextVersion(3, 3);
-    glutInitContextProfile(GLUT_CORE_PROFILE);
-    glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 
-   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-   glutInitWindowSize(width, height);
-   glutInitWindowPosition(0,0);
-   glutCreateWindow("a field and a sky");
-   glutDisplayFunc(drawScene);
-   glutReshapeFunc(resize);
-   glutMouseFunc(mouse);
-   glutKeyboardFunc(keyInput);
-   glutSpecialFunc(specialKeyInput);
-    glewExperimental = GL_TRUE;
-    glewInit();
-
->>>>>>> refs/remotes/origin/master
     setup();
 
     glutMainLoop();
