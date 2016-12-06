@@ -38,6 +38,8 @@
 #include "getbmp.h"
 #include "vertex.h"
 
+#define PI 3.14159265
+
 using namespace std;
 using namespace glm;
 
@@ -191,13 +193,18 @@ void drawScene(void)
 
    // Calculate and update modelview matrix.
    modelViewMat = mat4(1.0);
-   modelViewMat = lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
+   modelViewMat = lookAt(vec3(posX - 10 * sin( (PI / 180.0)), 10.0, posZ + 5 * cos( (PI / 180.0))), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
 
-   /*LookAt(
-            vec3(xVal - 10 * sin( (PI / 180.0) * angle), 0.0, zVal - 10 * cos( (PI / 180.0) * angle)),
-            vec3( xVal - 11 * sin( (PI / 180.0) * angle), 0.0, zVal - 11 * cos( (PI / 180.0) * angle)),
-            vec3(0.0, 1.0, 0.0);
-
+   /*    gluLookAt(xVal - 10 * sin( (PI / 180.0) * angle),
+              0.0,
+              zVal - 10 * cos( (PI / 180.0) * angle),
+              xVal - 11 * sin( (PI / 180.0) * angle),
+              0.0,
+              zVal - 11 * cos( (PI / 180.0) * angle),
+              0.0,
+              1.0,
+              0.0);
+    lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
    */
    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
