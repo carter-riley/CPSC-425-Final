@@ -44,7 +44,6 @@ using namespace glm;
 enum object {FIELD, SKY_F, SKY_B, SKY_R, SKY_L, SKY_T}; // VAO ids.
 enum buffer {FIELD_VERTICES, SKY_VERTICES_F, SKY_VERTICES_B, SKY_VERTICES_R, SKY_VERTICES_L, SKY_VERTICES_T }; // VBO ids.
 
-void drawSky(void);
 void setupShaders(void);
 
 
@@ -63,42 +62,42 @@ static Vertex fieldVertices[4] =
 
 static Vertex skyVerticesF[4] =
 {
-    {vec4(100.0, 0.0, -70.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 120.0, -70.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, 0.0, -70.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 120.0, -70.0, 1.0), vec2(0.0, 1.0)}
-};
-
-static Vertex skyVerticesB[4] =
-{
-    {vec4(-100.0, 0.0, 70.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(-100.0, 120.0, 70.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(100.0, 0.0, 70.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(100.0, 120.0, 70.0, 1.0), vec2(0.0, 1.0)}
-};
-
-static Vertex skyVerticesR[4] =
-{
-    {vec4(100.0, 0.0, 70.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 120.0, 70.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(100.0, 0.0, -70.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(100.0, 120.0, -70.0, 1.0), vec2(0.0, 1.0)}
+    {vec4(100.0, 0.0, -100.0, 1.0), vec2(1.0, 0.0)},
+    {vec4(100.0, 120.0, -100.0, 1.0), vec2(1.0, 1.0)},
+    {vec4(-100.0, 0.0, -100.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(-100.0, 120.0, -100.0, 1.0), vec2(0.0, 1.0)}
 };
 
 static Vertex skyVerticesL[4] =
 {
-    {vec4(-100.0, 0.0, -70.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(-100.0, 120.0, -70.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, 0.0, 70.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 120.0, 70.0, 1.0), vec2(0.0, 1.0)}
+    {vec4(-100.0, 0.0, -100.0, 1.0), vec2(1.0, 0.0)},
+    {vec4(-100.0, 120.0, -100.0, 1.0), vec2(1.0, 1.0)},
+    {vec4(-100.0, 0.0, 100.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(-100.0, 120.0, 100.0, 1.0), vec2(0.0, 1.0)}
+};
+
+static Vertex skyVerticesB[4] =
+{
+    {vec4(-100.0, 0.0, 100.0, 1.0), vec2(1.0, 0.0)},
+    {vec4(-100.0, 120.0, 100.0, 1.0), vec2(1.0, 1.0)},
+    {vec4(100.0, 0.0, 100.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(100.0, 120.0, 100.0, 1.0), vec2(0.0, 1.0)}
+};
+
+static Vertex skyVerticesR[4] =
+{
+    {vec4(100.0, 0.0, 100.0, 1.0), vec2(1.0, 0.0)},
+    {vec4(100.0, 120.0, 100.0, 1.0), vec2(1.0, 1.0)},
+    {vec4(100.0, 0.0, -100.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(100.0, 120.0, -100.0, 1.0), vec2(0.0, 1.0)}
 };
 
 static Vertex skyVerticesT[4] =
 {
-    {vec4(100.0, 120.0, 70.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 120.0, -70.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, 120.0, 70.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 120.0, -70.0, 1.0), vec2(0.0, 1.0)}
+    {vec4(100.0, 120.0, 100.0, 1.0), vec2(1.0, 0.0)},
+    {vec4(100.0, 120.0, -100.0, 1.0), vec2(1.0, 1.0)},
+    {vec4(-100.0, 120.0, 100.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(-100.0, 120.0, -100.0, 1.0), vec2(0.0, 1.0)}
 };
 
 
@@ -303,14 +302,8 @@ void setupShaders(void)
     glEnableVertexAttribArray(10);
     glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesT[0]), (void*)(sizeof(skyVerticesT[0].coords)));
     glEnableVertexAttribArray(11);
-
 }
 
-void drawSky(void)
-{
-
-
-}
 // OpenGL window reshape routine.
 void resize(int w, int h)
 {
