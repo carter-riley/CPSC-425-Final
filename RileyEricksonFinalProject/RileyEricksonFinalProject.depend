@@ -5,10 +5,11 @@
 
 1480985096 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\getbmp.h
 
-1481026077 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\main.cpp
+1481048886 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
+	<time.h>
 	<GL/glew.h>
 	<GLUT/freeglut.h>
 	<OpenGL/glext.h>
@@ -1392,4 +1393,11 @@
 	<GL/glew.h>
 	<GL/freeglut.h>
 	<GL/glext.h>
+
+1433764774 c:\mingw\include\time.h
+	<_mingw.h>
+	<parts/time.h>
+	<stddef.h>
+
+1433764774 c:\mingw\include\parts\time.h
 
