@@ -201,10 +201,12 @@ void setup(void)
     glBindTexture(GL_TEXTURE_2D, texture[1]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[1]->sizeX, image[1]->sizeY, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, image[1]->data);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     skyTexLoc = glGetUniformLocation(programId, "skyTex");
     glUniform1i(skyTexLoc, 1);
 
@@ -358,9 +360,9 @@ void mouse( GLint x, GLint y )
     if (tempvertexAngle > 360.0) tempvertexAngle -= 360.0;
     if (tempvertexAngle < 0.0) tempvertexAngle += 360.0;
 
-        xVal = tempxVal;
-        zVal = tempzVal;
-        vertexAngle = tempvertexAngle;
+    xVal = tempxVal;
+    zVal = tempzVal;
+    vertexAngle = tempvertexAngle;
 
     /*
     lookX = x - (width / 2);
