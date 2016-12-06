@@ -44,8 +44,8 @@ using namespace std;
 using namespace std;
 using namespace glm;
 
-enum object {FIELD, SKY}; // VAO ids.
-enum buffer {FIELD_VERTICES, SKY_VERTICES }; // VBO ids.
+enum object {FIELD, SKY, CLOUD}; // VAO ids.
+enum buffer {FIELD_VERTICES, SKY_VERTICES, CLOUD_VERTICES }; // VBO ids.
 
 void setupShaders(void);
 
@@ -56,20 +56,27 @@ int height = 800;
 // Globals.
 static Vertex fieldVertices[4] =
 {
-    {vec4(100.0, 0.0, 100.0, 1.0), vec2(40.0, 0.0)},
-    {vec4(100.0, 0.0, -100.0, 1.0), vec2(40.0, 40.0)},
-    {vec4(-100.0, 0.0, 100.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 0.0, -100.0, 1.0), vec2(0.0, 40.0)}
+    {vec4(200.0, 0.0, 200.0, 1.0), vec2(10.0, 0.0)},
+    {vec4(200.0, 0.0, -200.0, 1.0), vec2(10.0, 10.0)},
+    {vec4(-200.0, 0.0, 200.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(-200.0, 0.0, -200.0, 1.0), vec2(0.0, 10.0)}
 };
 
 static Vertex skyVertices[4] =
 {
-    {vec4(100.0, -100.0, -100.0, 1.0), vec2(1.0, 0.0)},
-    {vec4(100.0, 100.0, -100.0, 1.0), vec2(1.0, 1.0)},
-    {vec4(-100.0, -100.0, -100.0, 1.0), vec2(0.0, 0.0)},
-    {vec4(-100.0, 100.0, -100.0, 1.0), vec2(0.0, 1.0)}
+    {vec4(200.0, -200.0, -200.0, 1.0), vec2(1.0, 0.0)},
+    {vec4(200.0, 200.0, -200.0, 1.0), vec2(1.0, 1.0)},
+    {vec4(-200.0, -200.0, -200.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(-200.0, 200.0, -200.0, 1.0), vec2(0.0, 1.0)}
 };
 
+static Vertex cloudVertices[4] =
+{
+    {vec4(200.0, 200.0, 200.0, 1.0), vec2(1.0, 0.0)},
+    {vec4(200.0, 200.0, -200.0, 1.0), vec2(1.0, 1.0)},
+    {vec4(-200.0, 200.0, 200.0, 1.0), vec2(0.0, 0.0)},
+    {vec4(-200.0, 200.0, -200.0, 1.0), vec2(0.0, 1.0)}
+};
 
 static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
@@ -88,13 +95,13 @@ modelViewMatLoc,
 projMatLoc,
 grassTexLoc,
 skyTexLoc,
-sky1TexLoc,
+cloudTexLoc,
 objectLoc,
-buffer[2],
-vao[2],
-texture[6];
+buffer[3],
+vao[3],
+texture[3];
 
-static BitMapFile *image[6]; // Local storage for bmp image data.
+static BitMapFile *image[3]; // Local storage for bmp image data.
 
 void printControls()
 {
@@ -122,8 +129,8 @@ void setup(void)
     glUseProgram(programId);
 
     // Create VAOs and VBOs...
-    glGenVertexArrays(2, vao);
-    glGenBuffers(2, buffer);
+    glGenVertexArrays(3, vao);
+    glGenBuffers(3, buffer);
 
     // ...and associate data with vertex shader.
     glBindVertexArray(vao[FIELD]);
@@ -143,9 +150,18 @@ void setup(void)
     glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)(sizeof(skyVertices[0].coords)));
     glEnableVertexAttribArray(3);
 
+    // ...and associate data with vertex shader.
+    glBindVertexArray(vao[CLOUD]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[CLOUD_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cloudVertices), cloudVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(cloudVertices[0]), 0);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(cloudVertices[0]), (void*)(sizeof(cloudVertices[0].coords)));
+    glEnableVertexAttribArray(5);
+
     // Obtain projection matrix uniform location and set value.
     projMatLoc = glGetUniformLocation(programId,"projMat");
-    projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 1000.0);
+    projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 2000.0);
     glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
 
     // Obtain modelview matrix uniform and object uniform locations.
@@ -155,13 +171,9 @@ void setup(void)
     // Load the images.
     image[0] = getbmp("grass1.bmp");
     image[1] = getbmp("front.bmp");
-    image[2] = getbmp("back.bmp");
-    image[3] = getbmp("left.bmp");
-    image[4] = getbmp("right.bmp");
-    image[5] = getbmp("top.bmp");
-    image[6] = getbmp("bottom.bmp");
+    image[2] = getbmp("top.bmp");
     // Create texture ids.
-    glGenTextures(6, texture);
+    glGenTextures(3, texture);
 
     // Bind grass image.
     glActiveTexture(GL_TEXTURE0);
@@ -170,8 +182,7 @@ void setup(void)
                  GL_RGBA, GL_UNSIGNED_BYTE, image[0]->data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    grassTexLoc = glGetUniformLocation(programId, "grassTex");
-    glUniform1i(grassTexLoc, 0);
+
 
     // Filter using mipmap
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -186,24 +197,24 @@ void setup(void)
     glBindTexture(GL_TEXTURE_2D, texture[1]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[1]->sizeX, image[1]->sizeY, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, image[1]->data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     skyTexLoc = glGetUniformLocation(programId, "skyTex");
     glUniform1i(skyTexLoc, 1);
 
-    // Bind sky image.
+    // Bind cloud image.
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, texture[2]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[2]->sizeX, image[2]->sizeY, 0,
                  GL_RGBA, GL_UNSIGNED_BYTE, image[2]->data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    sky1TexLoc = glGetUniformLocation(programId, "sky1Tex");
-    glUniform1i(sky1TexLoc, 2);
+    cloudTexLoc = glGetUniformLocation(programId, "cloudTex");
+    glUniform1i(cloudTexLoc, 2);
     printControls();
 }
 
@@ -238,31 +249,44 @@ void drawScene(void)
     GLfloat angle = 90.0;
     // Draw sky.
 
+
+
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    modelViewMat = rotate(modelViewMat, angle, vec3(0.0, 1.0, 0.0));
 
-    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 200.0));
+    glUniform1ui(objectLoc, CLOUD);
+    glBindVertexArray(vao[CLOUD]);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+
+    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 400.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    modelViewMat = translate(modelViewMat, vec3(100.0, 0.0, 0.0));
-    modelViewMat = translate(modelViewMat, vec3(-100.0, 0.0, 0.0));
+    modelViewMat = translate(modelViewMat, vec3(200.0, 0.0, 0.0));
+    modelViewMat = translate(modelViewMat, vec3(-200.0, 0.0, 0.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
     glUniform1ui(objectLoc, SKY);
     glBindVertexArray(vao[SKY]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-//    modelViewMat = translate(modelViewMat, vec3(100.0, 0.0, 0.0));
-//    //modelViewMat = rotate(modelViewMat, angle, vec3(0.0, 1.0, 0.0));
-//    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 100.0));
-//    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-//    glUniform1ui(objectLoc, SKY);
-//    glBindVertexArray(vao[SKY]);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    modelViewMat = rotate(modelViewMat, float(PI /2), vec3(0.0, 1.0, 0.0));
+    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 400.0));
+    modelViewMat = translate(modelViewMat, vec3(400.0, 0.0, 0.0));
+
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    glUniform1ui(objectLoc, SKY);
+    glBindVertexArray(vao[SKY]);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 0.0));
+    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, -400.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    glUniform1ui(objectLoc, SKY);
+    glBindVertexArray(vao[SKY]);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glutSwapBuffers();
 }
