@@ -17,6 +17,8 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <time.h>
+
 
 #ifdef __APPLE__
 #  include <GL/glew.h>
@@ -71,6 +73,10 @@ static mat4 projMat = mat4(1.0);
 
 int lookX = 0, lookY = 0;
 int posX = 0, posZ = 0;
+
+
+static float vertexAngle = 0.0; // vertexAngle of the spacecraft.
+static float xVal = 0, zVal = 0, yVal; // Co-ordinates of the spacecraft.
 
 static unsigned int
    programId,
@@ -186,6 +192,8 @@ void setup(void)
    glUniform1i(skyTexLoc, 1);
 }
 
+
+
 // Drawing routine.
 void drawScene(void)
 {
@@ -193,19 +201,8 @@ void drawScene(void)
 
    // Calculate and update modelview matrix.
    modelViewMat = mat4(1.0);
-   modelViewMat = lookAt(vec3(posX - 10 * sin( (PI / 180.0)), 10.0, posZ + 5 * cos( (PI / 180.0))), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
+   modelViewMat = lookAt(vec3(xVal - 10 * sin( (PI / 180.0) * vertexAngle),10.0,zVal - 10 * cos( (PI / 180.0) * vertexAngle)), vec3(xVal - 11 * sin( (PI / 180.0) * vertexAngle), 10.0,zVal - 11 * cos( (PI / 180.0) * vertexAngle)),vec3(0.0, 1.0,0.0));
 
-   /*    gluLookAt(xVal - 10 * sin( (PI / 180.0) * angle),
-              0.0,
-              zVal - 10 * cos( (PI / 180.0) * angle),
-              xVal - 11 * sin( (PI / 180.0) * angle),
-              0.0,
-              zVal - 11 * cos( (PI / 180.0) * angle),
-              0.0,
-              1.0,
-              0.0);
-    lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
-   */
    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
    // Draw field.
@@ -217,7 +214,6 @@ void drawScene(void)
    glUniform1ui(objectLoc, SKY);
    glBindVertexArray(vao[SKY]);
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
    glutSwapBuffers();
 }
 
@@ -230,19 +226,24 @@ void resize(int w, int h)
 // Keyboard input processing routine.
 void keyInput(unsigned char key, int x, int y)
 {
+    float tempxVal = xVal, tempzVal = zVal, tempvertexAngle = vertexAngle;
    switch(key)
    {
       case 'w':
-        posZ -= 1;
+        tempxVal = xVal - sin(vertexAngle * PI / 180.0);
+        tempzVal = zVal - cos(vertexAngle * PI / 180.0);
         break;
       case 'a':
-        posX -= 1;
+        tempxVal = xVal - cos(vertexAngle * PI / 180.0);
+        tempzVal = zVal - sin(vertexAngle * PI / 180.0);
         break;
       case 's':
-        posZ += 1;
+        tempxVal = xVal + sin(vertexAngle * PI / 180.0);
+        tempzVal = zVal + cos(vertexAngle * PI / 180.0);
         break;
       case 'd':
-        posX += 1;
+        tempxVal = xVal + cos(vertexAngle * PI / 180.0);
+        tempzVal = zVal + sin(vertexAngle * PI / 180.0);
         break;
       case 27:
          exit(0);
@@ -250,25 +251,49 @@ void keyInput(unsigned char key, int x, int y)
       default:
          break;
    }
-   glutPostRedisplay();
-}
 
-// Callback routine for non-ASCII key entry.
-void specialKeyInput(int key, int x, int y)
-{
+    if (tempvertexAngle > 360.0) tempvertexAngle -= 360.0;
+    if (tempvertexAngle < 0.0) tempvertexAngle += 360.0;
+
+        xVal = tempxVal;
+        zVal = tempzVal;
+        vertexAngle = tempvertexAngle;
    glutPostRedisplay();
 }
 
 void mouse( GLint button, GLint state, GLint x, GLint y )
 {
-    //glutWarpPointer(width /2 ,height /2); //To warp the cursor to a screen position
+    float tempxVal = xVal, tempzVal = zVal, tempvertexAngle = vertexAngle;
+    glutWarpPointer(width /2 ,height /2); //To warp the cursor to a screen position
     //glutSetCursor(GLUT_CURSOR_NONE); //To hide the cursor
     //cout << "x = " << x << ", y = " << y << endl;
+/*
+    if(x > width/2)
+        tempvertexAngle = vertexAngle - 5.0;
+    if(x < width/2)
+        tempvertexAngle = vertexAngle + 5.0;
+    if(y > width/2)
+    if(y < width/2)
+            if (tempvertexAngle > 360.0) tempvertexAngle -= 360.0;
+    if (tempvertexAngle < 0.0) tempvertexAngle += 360.0;
+
+        xVal = tempxVal;
+        zVal = tempzVal;
+        vertexAngle = tempvertexAngle;
+    */
+    /*
     lookX = x - (width / 2);
     lookY = y - (height / 2);
     //cout << "lookX = " << lookX << ", lookY = " << lookY << endl;
+    */
     glutPostRedisplay();
 }
+
+void idle()
+{
+    glutPostRedisplay();
+}
+
 
 // Routine to output interaction instructions to the C++ window.
 void printInteraction(void)
@@ -294,8 +319,8 @@ int main(int argc, char **argv)
    glutDisplayFunc(drawScene);
    glutReshapeFunc(resize);
    glutMouseFunc(mouse);
+    glutIdleFunc(idle);
    glutKeyboardFunc(keyInput);
-   glutSpecialFunc(specialKeyInput);
 
    glewExperimental = GL_TRUE;
    glewInit();
