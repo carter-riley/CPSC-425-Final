@@ -123,7 +123,6 @@ texture[2];
 
 static BitMapFile *image[6]; // Local storage for bmp image data.
 
-<<<<<<< HEAD
 static float d = 0.0; // Distance parameter in gluLookAt().
 
 
@@ -151,7 +150,7 @@ void setup(void)
 
     // Obtain projection matrix uniform location and set value.
     projMatLoc = glGetUniformLocation(programId,"projMat");
-    projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 100.0);
+    projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 1000.0);
     glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
 
     // Obtain modelview matrix uniform and object uniform locations.
@@ -194,126 +193,24 @@ void setup(void)
 
     skyTexLoc = glGetUniformLocation(programId, "skyTex");
     glUniform1i(skyTexLoc, 1);
-=======
-// Initialization routine.
-void setup(void)
-{
-   glClearColor(0.0, 0.0, 0.0, 0.0);
-   glEnable(GL_DEPTH_TEST);
-
-   // Create shader program executable.
-   vertexShaderId = setShader("vertex", "vertexShader.glsl");
-   fragmentShaderId = setShader("fragment", "fragmentShader.glsl");
-   programId = glCreateProgram();
-   glAttachShader(programId, vertexShaderId);
-   glAttachShader(programId, fragmentShaderId);
-   glLinkProgram(programId);
-   glUseProgram(programId);
-
-   // Create VAOs and VBOs...
-   glGenVertexArrays(2, vao);
-   glGenBuffers(2, buffer);
-
-   // ...and associate data with vertex shader.
-   glBindVertexArray(vao[FIELD]);
-   glBindBuffer(GL_ARRAY_BUFFER, buffer[FIELD_VERTICES]);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(fieldVertices), fieldVertices, GL_STATIC_DRAW);
-   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(fieldVertices[0]), 0);
-   glEnableVertexAttribArray(0);
-   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(fieldVertices[0]), (void*)(sizeof(fieldVertices[0].coords)));
-   glEnableVertexAttribArray(1);
-
-   // ...and associate data with vertex shader.
-   glBindVertexArray(vao[SKY]);
-   glBindBuffer(GL_ARRAY_BUFFER, buffer[SKY_VERTICES]);
-   glBufferData(GL_ARRAY_BUFFER, sizeof(skyVertices), skyVertices, GL_STATIC_DRAW);
-   glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), 0);
-   glEnableVertexAttribArray(2);
-   glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(skyVertices[0]), (void*)(sizeof(skyVertices[0].coords)));
-   glEnableVertexAttribArray(3);
-
-   // Obtain projection matrix uniform location and set value.
-   projMatLoc = glGetUniformLocation(programId,"projMat");
-   projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 1000.0);
-   glUniformMatrix4fv(projMatLoc, 1, GL_FALSE, value_ptr(projMat));
-
-   // Obtain modelview matrix uniform and object uniform locations.
-   modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
-   objectLoc = glGetUniformLocation(programId, "object");
-
-   // Load the images.
-   image[0] = getbmp("grass1.bmp");
-   image[1] = getbmp("sky1.bmp");
-
-   // Create texture ids.
-   glGenTextures(2, texture);
-
-   // Bind grass image.
-   glActiveTexture(GL_TEXTURE0);
-   glBindTexture(GL_TEXTURE_2D, texture[0]);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[0]->sizeX, image[0]->sizeY, 0,
-	            GL_RGBA, GL_UNSIGNED_BYTE, image[0]->data);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-   // try different filtering techniques
-
-   // option 1
-   /*
-   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-   */
-
-   // option 2
-   /*
-   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-   */
-
-   // OPTION 3
-
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-   glGenerateMipmap(GL_TEXTURE_2D);
-
-
-   grassTexLoc = glGetUniformLocation(programId, "grassTex");
-   glUniform1i(grassTexLoc, 0);
-
-   // Bind sky image.
-   glActiveTexture(GL_TEXTURE1);
-   glBindTexture(GL_TEXTURE_2D, texture[1]);
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image[1]->sizeX, image[1]->sizeY, 0,
-	            GL_RGBA, GL_UNSIGNED_BYTE, image[1]->data);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   skyTexLoc = glGetUniformLocation(programId, "skyTex");
-   skyTexLoc = glGetUniformLocation(programId, "skyTex");
-   glUniform1i(skyTexLoc, 1);
->>>>>>> refs/remotes/origin/Carter-Branch
 }
 
 // Drawing routine.
 void drawScene(void)
 {
-<<<<<<< HEAD
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Calculate and update modelview matrix.
-    modelViewMat = mat4(1.0);
-    modelViewMat = lookAt(vec3(0.0, 10.0, 15.0 + d), vec3(0.0, 10.0, 0.0), vec3(0.0, 1.0, 0.0));
-    /*(xVal - 10 * sin( (PI / 180.0) * angle),
-               0.0,
-               zVal - 10 * cos( (PI / 180.0) * angle),
-               xVal - 11 * sin( (PI / 180.0) * angle),
-               0.0,
-               zVal - 11 * cos( (PI / 180.0) * angle),
-               0.0,
-               1.0,
-               0.0);
-    */
+   modelViewMat = mat4(1.0);
+   modelViewMat = lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
+
+   /*LookAt(
+            vec3(xVal - 10 * sin( (PI / 180.0) * angle), 0.0, zVal - 10 * cos( (PI / 180.0) * angle)),
+            vec3( xVal - 11 * sin( (PI / 180.0) * angle), 0.0, zVal - 11 * cos( (PI / 180.0) * angle)),
+            vec3(0.0, 1.0, 0.0);
+
+   */
+
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     // Draw field.
@@ -407,33 +304,6 @@ void setupShaders(void)
     glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(skyVerticesT[0]), (void*)(sizeof(skyVerticesT[0].coords)));
     glEnableVertexAttribArray(11);
 
-=======
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-   // Calculate and update modelview matrix.
-   modelViewMat = mat4(1.0);
-   modelViewMat = lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
-
-   /*LookAt(
-            vec3(xVal - 10 * sin( (PI / 180.0) * angle), 0.0, zVal - 10 * cos( (PI / 180.0) * angle)),
-            vec3( xVal - 11 * sin( (PI / 180.0) * angle), 0.0, zVal - 11 * cos( (PI / 180.0) * angle)),
-            vec3(0.0, 1.0, 0.0);
-
-   */
-   glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-
-   // Draw field.
-   glUniform1ui(objectLoc, FIELD);
-   glBindVertexArray(vao[FIELD]);
-   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-   // Draw sky.
-   glUniform1ui(objectLoc, SKY);
-   glBindVertexArray(vao[SKY]);
-   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-   glutSwapBuffers();
->>>>>>> refs/remotes/origin/Carter-Branch
 }
 
 void drawSky(void)
@@ -450,16 +320,6 @@ void resize(int w, int h)
 // Keyboard input processing routine.
 void keyInput(unsigned char key, int x, int y)
 {
-<<<<<<< HEAD
-    switch(key)
-    {
-    case 27:
-        exit(0);
-        break;
-    default:
-        break;
-    }
-=======
    switch(key)
    {
       case 'w':
@@ -481,200 +341,12 @@ void keyInput(unsigned char key, int x, int y)
          break;
    }
    glutPostRedisplay();
->>>>>>> refs/remotes/origin/Carter-Branch
 }
 
 // Callback routine for non-ASCII key entry.
 void specialKeyInput(int key, int x, int y)
 {
-<<<<<<< HEAD
-    if (key == GLUT_KEY_UP)
-    {
-        if (d > -50.0) d -= 0.1;
-    }
-    if (key == GLUT_KEY_DOWN)
-    {
-        if (d < 15.0) d += 0.1;
-    }
     glutPostRedisplay();
-
-/*
-    void specialKeyInput(int key, int x, int y)
-    {
-        float tempxVal = xVal, tempzVal = zVal, tempAngle = angle;
-
-        // Compute next position.
-        if (key == GLUT_KEY_LEFT) tempAngle = angle + 5.0;
-        if (key == GLUT_KEY_RIGHT) tempAngle = angle - 5.0;
-        if( key == GLUT_KEY_UP)
-        {
-            tempxVal = xVal - sin(angle * PI / 180.0);
-            tempzVal = zVal - cos(angle * PI / 180.0);
-        }
-        if( key == GLUT_KEY_DOWN)
-        {
-            tempxVal = xVal + sin(angle * PI / 180.0);
-            tempzVal = zVal + cos(angle * PI / 180.0);
-        }
-
-        // Angle correction.
-        if (tempAngle > 360.0) tempAngle -= 360.0;
-        if (tempAngle < 0.0) tempAngle += 360.0;
-
-        // Move spacecraft to next position only if there will not be collision with an asteroid.
-        if (!asteroidCraftCollision(tempxVal, tempzVal, tempAngle, false) )
-        {
-            isCollision = 0;
-            xVal = tempxVal;
-            zVal = tempzVal;
-            angle = tempAngle;
-        }
-        else isCollision = true;
-
-        glutPostRedisplay();
-
-    }
-}
-*/
-/*
-void
-mouse( GLint button, GLint state, GLint x, GLint y )
-{
-    static GLint buttons_down = 0;
-
-    if (state == GLUT_DOWN)
-    {
-        // cout << "mouse: button = " << button << "  state = " << state << "  x,y = " << x << "," << y << "\n";
-
-        switch (button)
-        {
-        case GLUT_LEFT_BUTTON:
-            // cout << "     mouse: GLUT_LEFT_BUTTON - TUMBLE\n";
-            action = TUMBLE;
-            xStart = x;
-            yStart = y;
-            break;
-        case GLUT_MIDDLE_BUTTON:
-            //  cout << "     mouse: GLUT_MIDDLE_BUTTON - DOLLY\n";
-            action = DOLLY;
-            xStart = x;
-            yStart = y;
-            break;
-        case GLUT_RIGHT_BUTTON:
-            //  cout << "     mouse: GLUT_RIGHT_BUTTON - TRACK\n";
-            action = TRACK;
-            xStart = x;
-            yStart = y;
-            break;
-        }
-    }
-    if (state == GLUT_UP)
-    {
-        // printControls();
-    }
-}
-
-//---------------------------------------------------------------------------- tumble
-// tumble about to location tumblePoint in World Coordinate System.
-void tumble(mat4 rx, mat4 ry, vec4 tumblePoint)
-{
-    // We want to rotate about the world coordinate system along a direction parallel to the
-    // camera's x axis. We first determine the coordinates of the WCS origin expressed in the eye coordinates.
-    // We then translate this point to the camera (origin in camera coordinates) and do a rotation about x.
-    // We then translate back. The result is then composed with the view matrix to give a new view matrix.
-   //  NEED TO IMPLEMENT !!!   When done, should have new value for eye, u, v, n
-
-   // DO THIS CONTROL LAST - IT IS THE MOST DIFFICULT PART
-
-   mat4 view  =  viewRotation * Translate( -eye );  // current view matrix
-
-   // X Rotate about tumble point in Camera Coord Sys
-   vec4 loc = view * tumblePoint;  // location of tumble point in cam coord
-   mat4 t2 = Translate(loc[0],loc[1],loc[2]);
-   mat4 t1 = Translate(-loc[0],-loc[1],-loc[2]);
-   mat4 xtransform = t2 * rx * t1;
-
-   // Y Rotate about tumble point in WCS
-    t2 = Translate(tumblePoint[0],tumblePoint[1],tumblePoint[2]);
-    t1 = Translate(-tumblePoint[0],-tumblePoint[1],-tumblePoint[2]);
-    mat4 ytransform = t2 * ry * t1;
-
-    mat4 newView = xtransform * view * ytransform;
-
-    // need to get eye position back
-    //  Here, rotInverse is the inverse of the rotational part of the view matrix.
-    //  eye = -rotInverse*view*origin  -> this gives the location of the WCS origin in the eye coordinates
-    mat4 rotInverse = transpose(newView);
-    rotInverse[3][0] = 0;
-    rotInverse[3][1] = 0;
-    rotInverse[3][2] = 0; // zero out translational part
-    rotInverse[3][3] = 1;
-    eye = -(rotInverse * newView * vec4(0,0,0,1));
-
-    viewRotation = newView;
-    viewRileyEricksonFinalProject/bin/Debug/RileyEricksonFinalProject.exewRotation[0][3] = 0;
-    viewRotation[1][3] = 0;
-    viewRotation[2][3] = 0;
-    viewRotation[3][3] = 1;
-}
-
-//---------------------------------------------------------------------------- motion
-void
-motion( GLint x, GLint y )
-{
-    float dx, dy;
-    mat4 ry, rx;
-    vec4 tumblePoint;
-
-    switch (action)
-    {
-    case TUMBLE:
-        dx = 0.05*(x - xStart);
-        dy = 0.05*(y - yStart);
-
-        ry = RotateY(10 * dx);
-        rx = RotateX(10 * dy);
-
-        // tumble about a point tumblePoint in WCS. Two options currently.
-        if (t == 0)   // tumble about origin in  WCS
-        {
-            tumblePoint =  vec4(0,0,0,1);
-        }
-        else        // tumble about fixed distance in front of camera in  WCS
-        {
-            tumblePoint =   eye - d*viewRotation[2];
-            tumblePoint[3] = 1;
-        }
-        tumble(rx, ry, tumblePoint);   //  <----  NEED TO IMPLEMENT this method!!!
-
-        xStart = x;
-        yStart = y;
-        break;
-    case TRACK:  // PAN
-        dx = -0.05 *
-        (x - xStart);
-        dy = 0.05*(y - yStart);
-         //  NEED TO IMPLEMENT !!!
-        eye = eye + dx*viewRotation[0] + dy*viewRotation[1];
-        eye[3]=1;
-        xStart = x;
-        yStart = y;
-        break;
-    case DOLLY:
-        dy = 0.05*(y - yStart);
-        dx = 0.05*(x - xStart);
-         //  NEED TO IMPLEMENT !!!
-         eye = eye - (dy+dx)*viewRotation[2];
-        eye[3]=1;
-        xStart = x;
-        yStart = y;
-        break;
-    default:
-        printf("unknown action %d\n", action);
-    }
-*/
-=======
-   glutPostRedisplay();
 }
 
 void mouse( GLint button, GLint state, GLint x, GLint y )
@@ -685,7 +357,6 @@ void mouse( GLint button, GLint state, GLint x, GLint y )
     lookX = x - (width / 2);
     lookY = y - (height / 2);
     //cout << "lookX = " << lookX << ", lookY = " << lookY << endl;
->>>>>>> refs/remotes/origin/Carter-Branch
     glutPostRedisplay();
 }
 
@@ -706,16 +377,6 @@ int main(int argc, char **argv)
     glutInitContextProfile(GLUT_CORE_PROFILE);
     glutInitContextFlags(GLUT_FORWARD_COMPATIBLE);
 
-<<<<<<< HEAD
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(500, 500);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("a field and a sky");
-    glutDisplayFunc(drawScene);
-    glutReshapeFunc(resize);
-    glutKeyboardFunc(keyInput);
-    glutSpecialFunc(specialKeyInput);
-=======
    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
    glutInitWindowSize(width, height);
    glutInitWindowPosition(0,0);
@@ -725,8 +386,6 @@ int main(int argc, char **argv)
    glutMouseFunc(mouse);
    glutKeyboardFunc(keyInput);
    glutSpecialFunc(specialKeyInput);
->>>>>>> refs/remotes/origin/Carter-Branch
-
     glewExperimental = GL_TRUE;
     glewInit();
 
