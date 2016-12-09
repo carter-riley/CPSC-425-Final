@@ -7,6 +7,7 @@ struct Vertex
 {
    glm::vec4 coords;
    glm::vec2 texCoords;
+   glm::vec3 normal;
 };
 
 #endif
