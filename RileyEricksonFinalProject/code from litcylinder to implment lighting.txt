@@ -1,0 +1,67 @@
+//in main.cpp
+
+// Light properties.
+static const Light light0 =
+{
+	vec4(0.0, 0.0, 0.0, 1.0),
+	vec4(1.0, 1.0, 1.0, 1.0),
+	vec4(1.0, 1.0, 1.0, 1.0),
+	vec4(0.0, 1.5, 3.0, 0.0)
+};
+
+//	Global ambient.
+static const vec4 globAmb = vec4(0.2, 0.2, 0.2, 1.0);
+
+// Front material properties.
+static const Material cylFront =
+{
+	vec4(0.9, 0.0, 0.0, 1.0),
+	vec4(0.9, 0.0, 0.0, 1.0),
+	vec4(1.0, 1.0, 1.0, 1.0),
+	vec4(0.0, 0.0, 0.0, 1.0),
+	50.0
+};
+
+//	in setup
+
+  // Obtain light property uniform locations and set values.
+   glUniform4fv(glGetUniformLocation(programId, "light0.ambCols"), 1, &light0.ambCols[0]);
+   glUniform4fv(glGetUniformLocation(programId, "light0.difCols"), 1, &light0.difCols[0]);
+   glUniform4fv(glGetUniformLocation(programId, "light0.specCols"), 1, &light0.specCols[0]);
+   glUniform4fv(glGetUniformLocation(programId, "light0.coords"), 1, &light0.coords[0]);
+
+   // Obtain global ambient uniform location and set value.
+   glUniform4fv(glGetUniformLocation(programId, "globAmb"), 1, &globAmb[0]);
+
+   // Obtain front material property uniform locations and set values.
+   glUniform4fv(glGetUniformLocation(programId, "cylFront.ambRefl"), 1, &cylFront.ambRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "cylFront.difRefl"), 1, &cylFront.difRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "cylFront.specRefl"), 1, &cylFront.specRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "cylFront.emitCols"), 1, &cylFront.emitCols[0]);
+   glUniform1f(glGetUniformLocation(programId, "cylFront.shininess"), cylFront.shininess);
+
+   // Obtain back material property uniform locations and set values.
+   glUniform4fv(glGetUniformLocation(programId, "cylBack.ambRefl"), 1, &cylBack.ambRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "cylBack.difRefl"), 1, &cylBack.difRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "cylBack.specRefl"), 1, &cylBack.specRefl[0]);
+   glUniform4fv(glGetUniformLocation(programId, "cylBack.emitCols"), 1, &cylBack.emitCols[0]);
+   glUniform1f(glGetUniformLocation(programId, "cylBack.shininess"), cylBack.shininess);
+   
+//in light.h
+   
+#ifndef LIGHT_H
+#define LIGHT_H
+
+#include <glm/glm.hpp>
+
+struct Light
+{
+   glm::vec4 ambCols;
+   glm::vec4 difCols;
+   glm::vec4 specCols;
+   glm::vec4 coords;
+};
+
+#endif
+
+//in material.h
