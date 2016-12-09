@@ -1,9 +1,9 @@
 /////////////////////////////////////////////////////////////////////////////////
 // RileyEricksonFinalProject
-//
+// main.cpp
 // Forward-compatible core GL 4.3 version of fieldAndSkyFiltered.cpp (except only
 // one filter is implemented).
-
+//
 // Comparing different filtering techniques
 //
 // Interaction:
@@ -41,6 +41,7 @@
 #include "cylinder.h"
 #include "light.h"
 #include "material.h"
+#include "tent.h"
 
 
 #define PI 3.14159265
@@ -48,8 +49,8 @@
 using namespace std;
 using namespace glm;
 
-enum object {FIELD, SKY1, SKY2, SKY3, SKY4, CLOUD, CYLINDER}; // VAO ids.
-enum buffer {FIELD_VERTICES, SKY1_VERTICES, SKY2_VERTICES, SKY3_VERTICES, SKY4_VERTICES, CLOUD_VERTICES, CYL_VERTICES, CYL_INDICES}; // VBO ids.
+enum object {FIELD, SKY1, SKY2, SKY3, SKY4, CLOUD, CYLINDER, TENT}; // VAO ids.
+enum buffer {FIELD_VERTICES, SKY1_VERTICES, SKY2_VERTICES, SKY3_VERTICES, SKY4_VERTICES, CLOUD_VERTICES, CYL_VERTICES, CYL_INDICES, TENT_VERTICES, TENT_INDICES}; // VBO ids.
 
 void setupShaders(void);
 
@@ -141,6 +142,11 @@ static unsigned int cylIndices[CYL_LATS][2 * (CYL_LONGS + 1)];
 static int cylCounts[CYL_LATS];
 static void* cylOffsets[CYL_LATS];
 
+static Vertex tentVertices[(TENT_LONGS + 1) * (TENT_LATS + 1)];
+static unsigned int tentIndices[TENT_LATS][2 * (TENT_LONGS + 1)];
+static int tentCounts[TENT_LATS];
+static void* tentOffsets[TENT_LATS];
+
 static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
 static mat3 normalMat = mat3(1.0);
@@ -204,9 +210,11 @@ void setup(void)
     // Initialize cylinder.
     fillCylinder(cylVertices, cylIndices, cylCounts, cylOffsets);
 
+    fillTent(tentVertices, tentIndices, tentCounts, tentOffsets);
+
     // Create VAOs and VBOs...
-    glGenVertexArrays(7, vao);
-    glGenBuffers(8, buffer);
+    glGenVertexArrays(8, vao);
+    glGenBuffers(9, buffer);
 
 
     // ...and associate data with vertex shader.
@@ -428,6 +436,10 @@ void drawScene(void)
     glUniform1ui(objectLoc, CYLINDER);
     glBindVertexArray(vao[CYLINDER]);
     glMultiDrawElements(GL_TRIANGLE_STRIP, cylCounts, GL_UNSIGNED_INT, (const void **)cylOffsets, CYL_LATS);
+
+    glUniform1ui(objectLoc, TENT);
+    glBindVertexArray(vao[TENT]);
+    glMultiDrawElements(GL_TRIANGLE_STRIP, tentCounts, GL_UNSIGNED_INT, (const void **)tentOffsets, TENT_LATS);
 
     glutSwapBuffers();
 }
