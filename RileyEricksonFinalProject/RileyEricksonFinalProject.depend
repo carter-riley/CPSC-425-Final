@@ -803,7 +803,7 @@
 	<GL/freeglut.h>
 	<GL/glext.h>
 
-1480968357 source:u:\graphics\rileyericksonfinalproject\getbmp.cpp
+1481256652 source:u:\graphics\rileyericksonfinalproject\getbmp.cpp
 	<fstream>
 	"getbmp.h"
 
@@ -824,10 +824,11 @@
 
 1480968357 u:\graphics\rileyericksonfinalproject\shader.h
 
-1481006273 source:u:\graphics\rileyericksonfinalproject\main.cpp
+1481278192 source:u:\graphics\rileyericksonfinalproject\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
+	<time.h>
 	<GL/glew.h>
 	<GLUT/freeglut.h>
 	<OpenGL/glext.h>
@@ -841,6 +842,10 @@
 	"shader.h"
 	"getbmp.h"
 	"vertex.h"
+	"cylinder.h"
+	"light.h"
+	"material.h"
+	"tent.h"
 
 1473918302 u:\graphics\glm\glm\glm.hpp
 	"detail/_fixes.hpp"
@@ -1352,7 +1357,7 @@
 
 1473918302 u:\graphics\glm\glm\gtc\matrix_inverse.inl
 
-1480968357 u:\graphics\rileyericksonfinalproject\vertex.h
+1481273228 u:\graphics\rileyericksonfinalproject\vertex.h
 	<glm/glm.hpp>
 
 1481256652 source:c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\getbmp.cpp
@@ -1436,4 +1441,27 @@
 
 1481273228 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\material.h
 	<glm/glm.hpp>
+
+1481273228 u:\graphics\rileyericksonfinalproject\cylinder.h
+	"vertex.h"
+
+1481273228 u:\graphics\rileyericksonfinalproject\light.h
+	<glm/glm.hpp>
+
+1481273228 u:\graphics\rileyericksonfinalproject\material.h
+	<glm/glm.hpp>
+
+1481273228 source:u:\graphics\rileyericksonfinalproject\cylinder.cpp
+	<cmath>
+	<iostream>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	"cylinder.h"
+
+1481276806 u:\graphics\rileyericksonfinalproject\tent.h
+	"vertex.h"
 

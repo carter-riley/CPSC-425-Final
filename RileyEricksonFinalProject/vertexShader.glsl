@@ -15,6 +15,8 @@ layout(location=10) in vec4 cloudCoords;
 layout(location=11) in vec2 cloudTexCoords;
 layout(location=12) in vec4 cylCoords;
 layout(location=13) in vec3 cylNormal;
+layout(location=14) in vec4 tentCoords;
+layout(location=15) in vec3 tentNormal;
 
 
 uniform mat4 modelViewMat;
@@ -102,6 +104,26 @@ void main(void)
                light0.specCols * cylinder.specRefl;
         coords = cylCoords;
         colsExport =  vec4(vec3(min(emit + cylGlobAmb + amb +
+                                    dif + spec, vec4(1.0))), 1.0);
+    }
+    if (object == 7)
+    {
+        normal = tentNormal;
+
+        normal = normalize(normalMat * normal);
+        lightDirection = normalize(vec3(light0.lCoords));
+        eyeDirection = -1.0 * normalize(vec3(modelViewMat * tentCoords));
+        halfway = (length(lightDirection + eyeDirection) == 0.0) ?
+                  vec3(0.0) : (lightDirection + eyeDirection)/length(lightDirection + eyeDirection);
+
+        emit += tent.emitCols;
+        tentGlobAmb += globAmb * tent.ambRefl;
+        amb += light0.ambCols * tent.ambRefl;
+        dif += max(dot(normal, lightDirection), 0.0) * light0.difCols * tent.difRefl;
+        spec += pow(max(dot(normal, halfway), 0.0), tent.shininess) *
+               light0.specCols * tent.specRefl;
+        coords = tentCoords;
+        colsExport =  vec4(vec3(min(emit + ctentGlobAmb + amb +
                                     dif + spec, vec4(1.0))), 1.0);
     }
     gl_Position = projMat * modelViewMat * coords;
