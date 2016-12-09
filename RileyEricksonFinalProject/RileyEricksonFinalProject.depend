@@ -1355,16 +1355,17 @@
 1480968357 u:\graphics\rileyericksonfinalproject\vertex.h
 	<glm/glm.hpp>
 
-1480968357 source:c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\getbmp.cpp
+1481256652 source:c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\getbmp.cpp
 	<fstream>
 	"getbmp.h"
 
 1480968357 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\getbmp.h
 
-1481006273 source:c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\main.cpp
+1481273228 source:c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
+	<time.h>
 	<GL/glew.h>
 	<GLUT/freeglut.h>
 	<OpenGL/glext.h>
@@ -1378,10 +1379,13 @@
 	"shader.h"
 	"getbmp.h"
 	"vertex.h"
+	"cylinder.h"
+	"light.h"
+	"material.h"
 
 1480968357 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\shader.h
 
-1480968357 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\vertex.h
+1481273228 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\vertex.h
 	<glm/glm.hpp>
 
 1480968357 source:c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\shader.cpp
@@ -1422,5 +1426,14 @@
 	<glm/glm.hpp>
 
 1481267154 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\material.h
+	<glm/glm.hpp>
+
+1481273228 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\cylinder.h
+	"vertex.h"
+
+1481273228 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\light.h
+	<glm/glm.hpp>
+
+1481273228 c:\users\criley2\documents\github\cpsc-425-final\rileyericksonfinalproject\material.h
 	<glm/glm.hpp>
 
