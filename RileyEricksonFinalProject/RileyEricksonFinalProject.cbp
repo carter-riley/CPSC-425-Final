@@ -44,9 +44,13 @@
 			<Add library="gdi32" />
 			<Add directory="C:/MinGW/lib" />
 		</Linker>
+		<Unit filename="cylinder.cpp" />
+		<Unit filename="cylinder.h" />
 		<Unit filename="getbmp.cpp" />
 		<Unit filename="getbmp.h" />
+		<Unit filename="light.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="material.h" />
 		<Unit filename="shader.cpp" />
 		<Unit filename="shader.h" />
 		<Unit filename="vertex.h" />

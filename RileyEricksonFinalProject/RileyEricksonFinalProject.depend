@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1480985096 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\getbmp.cpp
+1481249600 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\getbmp.cpp
 	<fstream>
 	"getbmp.h"
 
 1480985096 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\getbmp.h
 
-1481048886 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\main.cpp
+1481272869 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
@@ -23,6 +23,9 @@
 	"shader.h"
 	"getbmp.h"
 	"vertex.h"
+	"cylinder.h"
+	"light.h"
+	"material.h"
 
 1467824614 c:\mingw\include\gl\glew.h
 	<stddef.h>
@@ -784,10 +787,10 @@
 
 1480985096 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\shader.h
 
-1480985096 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\vertex.h
+1481263294 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\vertex.h
 	<glm/glm.hpp>
 
-1480985096 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\shader.cpp
+1481136624 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\shader.cpp
 	<cstdlib>
 	<iostream>
 	<fstream>
@@ -1400,4 +1403,24 @@
 	<stddef.h>
 
 1433764774 c:\mingw\include\parts\time.h
+
+1481267788 source:u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\cylinder.cpp
+	<cmath>
+	<iostream>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<OpenGL/glext.h>
+	<GL/glew.h>
+	<GL/freeglut.h>
+	<GL/glext.h>
+	"cylinder.h"
+
+1481269261 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\cylinder.h
+	"vertex.h"
+
+1481270592 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\light.h
+	<glm/glm.hpp>
+
+1481267154 u:\cpsc425\cpsc-425-final\rileyericksonfinalproject\material.h
+	<glm/glm.hpp>
 

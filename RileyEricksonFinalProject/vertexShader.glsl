@@ -13,15 +13,44 @@ layout(location=8) in vec4 sky4Coords;
 layout(location=9) in vec2 sky4TexCoords;
 layout(location=10) in vec4 cloudCoords;
 layout(location=11) in vec2 cloudTexCoords;
+layout(location=12) in vec4 cylCoords;
+layout(location=13) in vec3 cylNormal;
 
 
 uniform mat4 modelViewMat;
 uniform mat4 projMat;
+uniform mat3 normalMat;
 uniform uint object;
 
 out vec2 texCoordsExport;
+out vec4 colsExport;
 
 vec4 coords;
+
+struct Light
+{
+    vec4 ambCols;
+    vec4 difCols;
+    vec4 specCols;
+    vec4 lCoords;
+};
+uniform Light light0;
+
+uniform vec4 globAmb;
+
+struct Material
+{
+    vec4 ambRefl;
+    vec4 difRefl;
+    vec4 specRefl;
+    vec4 emitCols;
+    float shininess;
+};
+uniform Material cylinder;
+
+vec3 normal, lightDirection, eyeDirection, halfway;
+vec4 emit, cylGlobAmb, amb, dif, spec;
+
 
 void main(void)
 {
@@ -55,6 +84,25 @@ void main(void)
         coords = cloudCoords;
         texCoordsExport = cloudTexCoords;
     }
+    if (object == 6)
+    {
+        normal = cylNormal;
 
+        normal = normalize(normalMat * normal);
+        lightDirection = normalize(vec3(light0.lCoords));
+        eyeDirection = -1.0 * normalize(vec3(modelViewMat * cylCoords));
+        halfway = (length(lightDirection + eyeDirection) == 0.0) ?
+                  vec3(0.0) : (lightDirection + eyeDirection)/length(lightDirection + eyeDirection);
+
+        emit += cylinder.emitCols;
+        cylGlobAmb += globAmb * cylinder.ambRefl;
+        amb += light0.ambCols * cylinder.ambRefl;
+        dif += max(dot(normal, lightDirection), 0.0) * light0.difCols * cylinder.difRefl;
+        spec += pow(max(dot(normal, halfway), 0.0), cylinder.shininess) *
+               light0.specCols * cylinder.specRefl;
+        coords = cylCoords;
+        colsExport =  vec4(vec3(min(emit + cylGlobAmb + amb +
+                                    dif + spec, vec4(1.0))), 1.0);
+    }
     gl_Position = projMat * modelViewMat * coords;
 }

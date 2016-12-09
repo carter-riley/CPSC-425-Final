@@ -38,14 +38,18 @@
 #include "shader.h"
 #include "getbmp.h"
 #include "vertex.h"
+#include "cylinder.h"
+#include "light.h"
+#include "material.h"
+
 
 #define PI 3.14159265
 
 using namespace std;
 using namespace glm;
 
-enum object {FIELD, SKY1, SKY2, SKY3, SKY4, CLOUD}; // VAO ids.
-enum buffer {FIELD_VERTICES, SKY1_VERTICES, SKY2_VERTICES, SKY3_VERTICES, SKY4_VERTICES, CLOUD_VERTICES }; // VBO ids.
+enum object {FIELD, SKY1, SKY2, SKY3, SKY4, CLOUD, CYLINDER}; // VAO ids.
+enum buffer {FIELD_VERTICES, SKY1_VERTICES, SKY2_VERTICES, SKY3_VERTICES, SKY4_VERTICES, CLOUD_VERTICES, CYL_VERTICES, CYL_INDICES}; // VBO ids.
 
 void setupShaders(void);
 
@@ -54,6 +58,30 @@ int width = 800;
 int height = 800;
 
 // Globals.
+
+
+// Light properties.
+static const Light light0 =
+{
+    vec4(0.0, 0.0, 0.0, 1.0),
+    vec4(1.0, 1.0, 1.0, 1.0),
+    vec4(1.0, 1.0, 1.0, 1.0),
+    vec4(10.0, 10.0, 10.0, 0.0 )
+};
+
+// Global ambient.
+static const vec4 globAmb = vec4(0.2, 0.2, 0.2, 1.0);
+
+// Cylinder material properties.
+static const Material cylinder =
+{
+    vec4(0.0, 0.5, 0.5, 1.0),
+    vec4(0.0, 0.5, 0.5, 1.0),
+    vec4(0.0, 1.0, 1.0, 1.0),
+    vec4(0.0, 0.0, 0.0, 1.0),
+    50.0
+};
+
 static Vertex fieldVertices[4] =
 {
     {vec4(200.0, 0.0, 200.0, 1.0), vec2(10.0, 0.0)},
@@ -79,6 +107,7 @@ static Vertex sky2Vertices[4] =
     {vec4(-200.0, -200.0, 200.0, 1.0), vec2(0.0, 0.0)},
     {vec4(-200.0, 200.0, 200.0, 1.0), vec2(0.0, 1.0)}
 };
+
 //Right skybox image
 static Vertex sky3Vertices[4] =
 {
@@ -87,6 +116,7 @@ static Vertex sky3Vertices[4] =
     {vec4(200.0, -200.0, 200.0, 1.0), vec2(0.0, 0.0)},
     {vec4(200.0, 200.0, 200.0, 1.0), vec2(0.0, 1.0)}
 };
+
 //Right skybox image
 static Vertex sky4Vertices[4] =
 {
@@ -95,6 +125,7 @@ static Vertex sky4Vertices[4] =
     {vec4(-200.0, -200.0, -200.0, 1.0), vec2(0.0, 0.0)},
     {vec4(-200.0, 200.0, -200.0, 1.0), vec2(0.0, 1.0)}
 };
+
 //Top skybox image
 static Vertex cloudVertices[4] =
 {
@@ -104,15 +135,22 @@ static Vertex cloudVertices[4] =
     {vec4(-200.0, 200.0, -200.0, 1.0), vec2(0.0, 1.0)}
 };
 
+// Cylinder data.
+static Vertex cylVertices[(CYL_LONGS + 1) * (CYL_LATS + 1)];
+static unsigned int cylIndices[CYL_LATS][2 * (CYL_LONGS + 1)];
+static int cylCounts[CYL_LATS];
+static void* cylOffsets[CYL_LATS];
+
 static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
+static mat3 normalMat = mat3(1.0);
 
 int lookX = 0, lookY = 0;
 int posX = 0, posZ = 0;
 
 
-static float vertexAngle = 0.0; // vertexAngle of the spacecraft.
-static float xVal = 0, zVal = 0, yVal; // Co-ordinates of the spacecraft.
+static float vertexAngle = 0.0;
+static float xVal = 0, zVal = 0, yVal;
 
 static unsigned int
 programId,
@@ -120,6 +158,7 @@ vertexShaderId,
 fragmentShaderId,
 modelViewMatLoc,
 projMatLoc,
+normalMatLoc,
 grassTexLoc,
 sky1TexLoc,
 sky2TexLoc,
@@ -127,8 +166,8 @@ sky3TexLoc,
 sky4TexLoc,
 cloudTexLoc,
 objectLoc,
-buffer[6],
-vao[6],
+buffer[8],
+vao[7],
 texture[6];
 
 static BitMapFile *image[6]; // Local storage for bmp image data.
@@ -149,6 +188,8 @@ void printControls()
 // Initialization routine.
 void setup(void)
 {
+    glClearColor(1.0, 1.0, 1.0, 0.0);
+
     glEnable(GL_DEPTH_TEST);
 
     // Create shader program executable.
@@ -160,9 +201,13 @@ void setup(void)
     glLinkProgram(programId);
     glUseProgram(programId);
 
+    // Initialize cylinder.
+    fillCylinder(cylVertices, cylIndices, cylCounts, cylOffsets);
+
     // Create VAOs and VBOs...
-    glGenVertexArrays(6, vao);
-    glGenBuffers(6, buffer);
+    glGenVertexArrays(7, vao);
+    glGenBuffers(8, buffer);
+
 
     // ...and associate data with vertex shader.
     glBindVertexArray(vao[FIELD]);
@@ -218,6 +263,17 @@ void setup(void)
     glVertexAttribPointer(11, 2, GL_FLOAT, GL_FALSE, sizeof(cloudVertices[0]), (void*)(sizeof(cloudVertices[0].coords)));
     glEnableVertexAttribArray(11);
 
+    // ...and associate data with vertex shader.
+    glBindVertexArray(vao[CYLINDER]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[CYL_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(cylVertices), cylVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[CYL_INDICES]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cylIndices), cylIndices, GL_STATIC_DRAW);
+    glVertexAttribPointer(12, 4, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]), 0);
+    glEnableVertexAttribArray(12);
+    glVertexAttribPointer(13, 3, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]), (void*)sizeof(cylVertices[0].coords));
+    glEnableVertexAttribArray(13);
+
     // Obtain projection matrix uniform location and set value.
     projMatLoc = glGetUniformLocation(programId,"projMat");
     projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 2000.0);
@@ -226,6 +282,22 @@ void setup(void)
     // Obtain modelview matrix uniform and object uniform locations.
     modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
     objectLoc = glGetUniformLocation(programId, "object");
+
+    // Obtain light property uniform locations and set values.
+    glUniform4fv(glGetUniformLocation(programId, "light0.ambCols"), 1, &light0.ambCols[0]);
+    glUniform4fv(glGetUniformLocation(programId, "light0.difCols"), 1, &light0.difCols[0]);
+    glUniform4fv(glGetUniformLocation(programId, "light0.specCols"), 1, &light0.specCols[0]);
+    glUniform4fv(glGetUniformLocation(programId, "light0.lCoords"), 1, &light0.lCoords[0]);
+
+    // Obtain global ambient uniform location and set value.
+    glUniform4fv(glGetUniformLocation(programId, "globAmb"), 1, &globAmb[0]);
+
+    // Obtain cylinder material property uniform locations and set values.
+    glUniform4fv(glGetUniformLocation(programId, "cylinder.ambRefl"), 1, &cylinder.ambRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "cylinder.difRefl"), 1, &cylinder.difRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "cylinder.specRefl"), 1, &cylinder.specRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "cylinder.emitCols"), 1, &cylinder.emitCols[0]);
+    glUniform1f(glGetUniformLocation(programId, "cylinder.shininess"), cylinder.shininess);
 
     // Load the images.
     image[0] = getbmp("grass1.bmp");
@@ -339,72 +411,34 @@ void drawScene(void)
     //modelViewMat = lookAt(vec3(posX - 10 * sin( (PI / 180.0)), 10.0, posZ + 5 * cos( (PI / 180.0))), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
     modelViewMat = lookAt(vec3(xVal - 10 * sin( (PI / 180.0) * vertexAngle),10.0,zVal - 10 * cos( (PI / 180.0) * vertexAngle)), vec3(xVal - 11 * sin( (PI / 180.0) * vertexAngle), 10.0 + -lookY*0.01,zVal - 11 * cos( (PI / 180.0) * vertexAngle)),vec3(0.0, 1.0,0.0));
 
-    /*    gluLookAt(xVal - 10 * sin( (PI / 180.0) * angle),
-               0.0,
-               zVal - 10 * cos( (PI / 180.0) * angle),
-               xVal - 11 * sin( (PI / 180.0) * angle),
-               0.0,
-               zVal - 11 * cos( (PI / 180.0) * angle),
-               0.0,
-               1.0,
-               0.0);
-     lookAt(vec3(posX,  10, posZ + 15), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
-    */
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
-    // Draw field.
-    glUniform1ui(objectLoc, FIELD);
-    glBindVertexArray(vao[FIELD]);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    // Calculate and update normal matrix.
+    normalMat = transpose(inverse(mat3(modelViewMat)));
+    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
 
-    GLfloat angle = 90.0;
 
     drawSky();
-//    // Draw sky.
-//    glUniform1ui(objectLoc, SKY);
-//    glBindVertexArray(vao[SKY]);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-//
-//    glUniform1ui(objectLoc, CLOUD);
-//    glBindVertexArray(vao[CLOUD]);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-
-//    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 400.0));
-//    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-//    glUniform1ui(objectLoc, SKY);
-//    glBindVertexArray(vao[SKY]);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-//
-//    modelViewMat = translate(modelViewMat, vec3(200.0, 0.0, 0.0));
-//    modelViewMat = translate(modelViewMat, vec3(-200.0, 0.0, 0.0));
-//    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-//    glUniform1ui(objectLoc, SKY);
-//    glBindVertexArray(vao[SKY]);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-//
-//    modelViewMat = rotate(modelViewMat, float(PI /2), vec3(0.0, 1.0, 0.0));
-//    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 400.0));
-//    modelViewMat = translate(modelViewMat, vec3(400.0, 0.0, 0.0));
-//
-//    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-//    glUniform1ui(objectLoc, SKY);
-//    glBindVertexArray(vao[SKY]);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-//
-//    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 0.0));
-//    modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, -400.0));
-//    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-//
-//    glUniform1ui(objectLoc, SKY);
-//    glBindVertexArray(vao[SKY]);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    // Draw cylinder.
+    modelViewMat = rotate(modelViewMat, float(PI /2), vec3(1.0, 0.0, 0.0));
+    modelViewMat = scale(modelViewMat, vec3(3.0, 3.0, 2.0));
+    //modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 60.0));
+    glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
+    glUniform1ui(objectLoc, CYLINDER);
+    glBindVertexArray(vao[CYLINDER]);
+    glMultiDrawElements(GL_TRIANGLE_STRIP, cylCounts, GL_UNSIGNED_INT, (const void **)cylOffsets, CYL_LATS);
 
     glutSwapBuffers();
 }
 
 void drawSky(void)
 {
+    // Draw field.
+    glUniform1ui(objectLoc, FIELD);
+    glBindVertexArray(vao[FIELD]);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
     glUniform1ui(objectLoc, SKY1);
     glBindVertexArray(vao[SKY1]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -424,6 +458,8 @@ void drawSky(void)
     glUniform1ui(objectLoc, CLOUD);
     glBindVertexArray(vao[CLOUD]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glBindVertexArray(0);
 }
 
 // OpenGL window reshape routine.
@@ -464,6 +500,7 @@ void keyInput(unsigned char key, int x, int y)
     xVal = tempxVal;
     zVal = tempzVal;
     vertexAngle = tempvertexAngle;
+
     glutPostRedisplay();
 }
 
