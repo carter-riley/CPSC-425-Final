@@ -17,7 +17,6 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
-#include <time.h>
 
 #ifdef __APPLE__
 #  include <GL/glew.h>
@@ -75,6 +74,15 @@ static const vec4 globAmb = vec4(0.2, 0.2, 0.2, 1.0);
 
 // Cylinder material properties.
 static const Material cylinder =
+{
+    vec4(0.0, 0.5, 0.5, 1.0),
+    vec4(0.0, 0.5, 0.5, 1.0),
+    vec4(0.0, 1.0, 1.0, 1.0),
+    vec4(0.0, 0.0, 0.0, 1.0),
+    50.0
+};
+
+static const Material tent =
 {
     vec4(0.0, 0.5, 0.5, 1.0),
     vec4(0.0, 0.5, 0.5, 1.0),
@@ -142,10 +150,10 @@ static unsigned int cylIndices[CYL_LATS][2 * (CYL_LONGS + 1)];
 static int cylCounts[CYL_LATS];
 static void* cylOffsets[CYL_LATS];
 
-static Vertex tentVertices[(TENT_LONGS + 1) * (TENT_LATS + 1)];
-static unsigned int tentIndices[TENT_LATS][2 * (TENT_LONGS + 1)];
-static int tentCounts[TENT_LATS];
-static void* tentOffsets[TENT_LATS];
+static Vertex tentVertices[6];
+static unsigned int tentIndices[6];
+static int tentCounts[6];
+static void* tentOffsets[6];
 
 static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
@@ -172,8 +180,8 @@ sky3TexLoc,
 sky4TexLoc,
 cloudTexLoc,
 objectLoc,
-buffer[8],
-vao[7],
+buffer[9],
+vao[8],
 texture[6];
 
 static BitMapFile *image[6]; // Local storage for bmp image data.
@@ -210,7 +218,7 @@ void setup(void)
     // Initialize cylinder.
     fillCylinder(cylVertices, cylIndices, cylCounts, cylOffsets);
 
-    fillTent(tentVertices, tentIndices, tentCounts, tentOffsets);
+    fillTent();
 
     // Create VAOs and VBOs...
     glGenVertexArrays(8, vao);
@@ -282,6 +290,16 @@ void setup(void)
     glVertexAttribPointer(13, 3, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]), (void*)sizeof(cylVertices[0].coords));
     glEnableVertexAttribArray(13);
 
+        glBindVertexArray(vao[TENT]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[TENT_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tentVertices), tentVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[TENT_INDICES]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(tentIndices), tentIndices, GL_STATIC_DRAW);
+    glVertexAttribPointer(13, 6, GL_FLOAT, GL_FALSE, sizeof(tentVertices[0]), 0);
+    glEnableVertexAttribArray(12);
+    glVertexAttribPointer(13, 3, GL_FLOAT, GL_FALSE, sizeof(tentVertices[0]), (void*)sizeof(tentVertices[0].coords));
+    glEnableVertexAttribArray(14);
+
     // Obtain projection matrix uniform location and set value.
     projMatLoc = glGetUniformLocation(programId,"projMat");
     projMat = frustum(-5.0, 5.0, -5.0, 5.0, 5.0, 2000.0);
@@ -306,6 +324,12 @@ void setup(void)
     glUniform4fv(glGetUniformLocation(programId, "cylinder.specRefl"), 1, &cylinder.specRefl[0]);
     glUniform4fv(glGetUniformLocation(programId, "cylinder.emitCols"), 1, &cylinder.emitCols[0]);
     glUniform1f(glGetUniformLocation(programId, "cylinder.shininess"), cylinder.shininess);
+
+    glUniform4fv(glGetUniformLocation(programId, "tent.ambRefl"), 1, &tent.ambRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "tent.difRefl"), 1, &tent.difRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "tent.specRefl"), 1, &tent.specRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "tent.emitCols"), 1, &tent.emitCols[0]);
+    glUniform1f(glGetUniformLocation(programId, "tent.shininess"), tent.shininess);
 
     // Load the images.
     image[0] = getbmp("grass1.bmp");
@@ -439,7 +463,7 @@ void drawScene(void)
 
     glUniform1ui(objectLoc, TENT);
     glBindVertexArray(vao[TENT]);
-    glMultiDrawElements(GL_TRIANGLE_STRIP, tentCounts, GL_UNSIGNED_INT, (const void **)tentOffsets, TENT_LATS);
+    glMultiDrawElements(GL_TRIANGLE_STRIP, tentCounts, GL_UNSIGNED_INT, (const void **)tentOffsets, 6);
 
     glutSwapBuffers();
 }

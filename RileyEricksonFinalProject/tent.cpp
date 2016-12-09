@@ -17,7 +17,8 @@
 using namespace std;
 
 // Fill the vertex array with co-ordinates of the sample points.
-void fillTentVertexArray(Vertex tentVertices[(TENT_LONGS + 1) * (TENT_LATS + 1)])
+
+void fillTent(void)
 {
 	 int k = 0;
 	 int x = 10;
@@ -69,43 +70,6 @@ void fillTentVertexArray(Vertex tentVertices[(TENT_LONGS + 1) * (TENT_LATS + 1)]
 	 tentVertices[k].normal.x = 0.0;
 	 tentVertices[k].normal.y = 0.0;
 	 tentVertices[k].normal.z = 0.0;
-}
 
-void fillTentIndices(unsigned int tentIndices[TENT_LATS][2 * (TENT_LONGS + 1)])
-{
-   int i, j;
-   for(j = 0; j < TENT_LATS; j++)
-   {
-      for (i = 0; i <= TENT_LONGS; i++)
-      {
-	     tentIndices[j][2 * i]     = (j + 1) * (TENT_LONGS + 1) + i;
-	     tentIndices[j][2 * i + 1] =    j    * (TENT_LONGS + 1) + i;
-      }
-   }
-}
-
-// Fill the array tentCounts.
-void fillTentCounts(int tentCounts[TENT_LATS])
-{
-   int j;
-   for(j = 0; j < TENT_LATS; j++) tentCounts[j] = 2 * (TENT_LONGS + 1);
-}
-
-// Fill the array tentOffsets.
-void fillTentOffsets(void* tentOffsets[TENT_LATS])
-{
-   int j;
-   for(j = 0; j < TENT_LATS; j++) tentOffsets[j] = (GLvoid*)(2 * (TENT_LONGS + 1) * j * sizeof(unsigned int));
-}
-
-void fillTent(Vertex tentVertices[(TENT_LONGS + 1) * (TENT_LATS + 1)],
-	         unsigned int tentIndices[TENT_LATS][2 * (TENT_LONGS+1)],
-			 int tentCounts[TENT_LATS],
-			 void* tentOffsets[TENT_LATS]);
-
-{
-   fillTentVertexArray(tentVertices);
-   fillTentIndices(tentIndices);
-   fillTentCounts(tentCounts);
-   fillTentOffsets(tentOffsets);
+	 tentIndices = {0, 4, 1, 5, 3, 6};
 }

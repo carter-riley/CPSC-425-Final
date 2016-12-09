@@ -824,11 +824,10 @@
 
 1480968357 u:\graphics\rileyericksonfinalproject\shader.h
 
-1481278192 source:u:\graphics\rileyericksonfinalproject\main.cpp
+1481281653 source:u:\graphics\rileyericksonfinalproject\main.cpp
 	<cmath>
 	<iostream>
 	<fstream>
-	<time.h>
 	<GL/glew.h>
 	<GLUT/freeglut.h>
 	<OpenGL/glext.h>
@@ -1462,6 +1461,6 @@
 	<GL/glext.h>
 	"cylinder.h"
 
-1481276806 u:\graphics\rileyericksonfinalproject\tent.h
+1481281834 u:\graphics\rileyericksonfinalproject\tent.h
 	"vertex.h"
 
