@@ -1,17 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 // RileyEricksonFinalProject
 //
-// Forward-compatible core GL 4.3 version of fieldAndSkyFiltered.cpp (except only
-// one filter is implemented).
-
-// Comparing different filtering techniques
-//
-// Interaction:
-// Press the up and down arrow keys to move the viewpoint over the field.
-//
-// Sumanta Guha
-//
-// Texture Credits: See ExperimenterSource/Textures/TEXTURE_CREDITS.txt
+// Creates a game environment with an object and lighting effects.
 /////////////////////////////////////////////////////////////////////////////////
 
 #include <cmath>
@@ -38,7 +28,7 @@
 #include "shader.h"
 #include "getbmp.h"
 #include "vertex.h"
-#include "cylinder.h"
+#include "torus.h"
 #include "light.h"
 #include "material.h"
 
@@ -48,10 +38,9 @@
 using namespace std;
 using namespace glm;
 
-enum object {FIELD, SKY1, SKY2, SKY3, SKY4, CLOUD, CYLINDER}; // VAO ids.
-enum buffer {FIELD_VERTICES, SKY1_VERTICES, SKY2_VERTICES, SKY3_VERTICES, SKY4_VERTICES, CLOUD_VERTICES, CYL_VERTICES, CYL_INDICES}; // VBO ids.
+enum object {FIELD, SKY1, SKY2, SKY3, SKY4, CLOUD, TORUS}; // VAO ids.
+enum buffer {FIELD_VERTICES, SKY1_VERTICES, SKY2_VERTICES, SKY3_VERTICES, SKY4_VERTICES, CLOUD_VERTICES, TOR_VERTICES, TOR_INDICES}; // VBO ids.
 
-void setupShaders(void);
 
 
 int width = 800;
@@ -66,21 +55,22 @@ static const Light light0 =
     vec4(0.0, 0.0, 0.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
     vec4(1.0, 1.0, 1.0, 1.0),
-    vec4(10.0, 10.0, 10.0, 0.0 )
+    vec4(-200.0, -200.0, -200.0, .0)
 };
 
 // Global ambient.
 static const vec4 globAmb = vec4(0.2, 0.2, 0.2, 1.0);
 
-// Cylinder material properties.
-static const Material cylinder =
+// Torus material properties.
+static const Material torus =
 {
-    vec4(0.0, 0.5, 0.5, 1.0),
-    vec4(0.0, 0.5, 0.5, 1.0),
-    vec4(0.0, 1.0, 1.0, 1.0),
-    vec4(0.0, 0.0, 0.0, 1.0),
+    vec4(0.8, 0.8, 0.8, 1.0),
+    vec4(0.8, 0.8, 0.8, 1.0),
+    vec4(0.8, 0.8, 0.8, 1.0),
+    vec4(0.2, 0.2, 0.2, 1.0),
     50.0
 };
+
 
 static Vertex fieldVertices[4] =
 {
@@ -135,11 +125,11 @@ static Vertex cloudVertices[4] =
     {vec4(-200.0, 200.0, -200.0, 1.0), vec2(0.0, 1.0)}
 };
 
-// Cylinder data.
-static Vertex cylVertices[(CYL_LONGS + 1) * (CYL_LATS + 1)];
-static unsigned int cylIndices[CYL_LATS][2 * (CYL_LONGS + 1)];
-static int cylCounts[CYL_LATS];
-static void* cylOffsets[CYL_LATS];
+// Torus data.
+static Vertex torVertices[(TOR_LONGS + 1) * (TOR_LATS + 1)];
+static unsigned int torIndices[TOR_LATS][2 * (TOR_LONGS + 1)];
+static int torCounts[TOR_LATS];
+static void* torOffsets[TOR_LATS];
 
 static mat4 modelViewMat = mat4(1.0);
 static mat4 projMat = mat4(1.0);
@@ -201,8 +191,8 @@ void setup(void)
     glLinkProgram(programId);
     glUseProgram(programId);
 
-    // Initialize cylinder.
-    fillCylinder(cylVertices, cylIndices, cylCounts, cylOffsets);
+    // Initialize torus.
+    fillTorus(torVertices, torIndices, torCounts, torOffsets);
 
     // Create VAOs and VBOs...
     glGenVertexArrays(7, vao);
@@ -264,14 +254,14 @@ void setup(void)
     glEnableVertexAttribArray(11);
 
     // ...and associate data with vertex shader.
-    glBindVertexArray(vao[CYLINDER]);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[CYL_VERTICES]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cylVertices), cylVertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[CYL_INDICES]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cylIndices), cylIndices, GL_STATIC_DRAW);
-    glVertexAttribPointer(12, 4, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]), 0);
+    glBindVertexArray(vao[TORUS]);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[TOR_VERTICES]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(torVertices), torVertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[TOR_INDICES]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(torIndices), torIndices, GL_STATIC_DRAW);
+    glVertexAttribPointer(12, 4, GL_FLOAT, GL_FALSE, sizeof(torVertices[0]), 0);
     glEnableVertexAttribArray(12);
-    glVertexAttribPointer(13, 3, GL_FLOAT, GL_FALSE, sizeof(cylVertices[0]), (void*)sizeof(cylVertices[0].coords));
+    glVertexAttribPointer(13, 3, GL_FLOAT, GL_FALSE, sizeof(torVertices[0]), (void*)sizeof(torVertices[0].coords)+sizeof(torVertices[0].texCoords) );
     glEnableVertexAttribArray(13);
 
     // Obtain projection matrix uniform location and set value.
@@ -281,6 +271,7 @@ void setup(void)
 
     // Obtain modelview matrix uniform and object uniform locations.
     modelViewMatLoc = glGetUniformLocation(programId,"modelViewMat");
+    normalMatLoc = glGetUniformLocation(programId,"normalMat");
     objectLoc = glGetUniformLocation(programId, "object");
 
     // Obtain light property uniform locations and set values.
@@ -292,12 +283,12 @@ void setup(void)
     // Obtain global ambient uniform location and set value.
     glUniform4fv(glGetUniformLocation(programId, "globAmb"), 1, &globAmb[0]);
 
-    // Obtain cylinder material property uniform locations and set values.
-    glUniform4fv(glGetUniformLocation(programId, "cylinder.ambRefl"), 1, &cylinder.ambRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "cylinder.difRefl"), 1, &cylinder.difRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "cylinder.specRefl"), 1, &cylinder.specRefl[0]);
-    glUniform4fv(glGetUniformLocation(programId, "cylinder.emitCols"), 1, &cylinder.emitCols[0]);
-    glUniform1f(glGetUniformLocation(programId, "cylinder.shininess"), cylinder.shininess);
+    // Obtain torus material property uniform locations and set values.
+    glUniform4fv(glGetUniformLocation(programId, "torus.ambRefl"), 1, &torus.ambRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "torus.difRefl"), 1, &torus.difRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "torus.specRefl"), 1, &torus.specRefl[0]);
+    glUniform4fv(glGetUniformLocation(programId, "torus.emitCols"), 1, &torus.emitCols[0]);
+    glUniform1f(glGetUniformLocation(programId, "torus.shininess"), torus.shininess);
 
     // Load the images.
     image[0] = getbmp("grass1.bmp");
@@ -410,7 +401,6 @@ void drawScene(void)
     modelViewMat = mat4(1.0);
     //modelViewMat = lookAt(vec3(posX - 10 * sin( (PI / 180.0)), 10.0, posZ + 5 * cos( (PI / 180.0))), vec3(lookX * 0.1, (-lookY * 0.1) + 10, 0.0), vec3(0.0, 1.0, 0.0));
     modelViewMat = lookAt(vec3(xVal - 10 * sin( (PI / 180.0) * vertexAngle),10.0,zVal - 10 * cos( (PI / 180.0) * vertexAngle)), vec3(xVal - 11 * sin( (PI / 180.0) * vertexAngle), 10.0 + -lookY*0.01,zVal - 11 * cos( (PI / 180.0) * vertexAngle)),vec3(0.0, 1.0,0.0));
-
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
 
     // Calculate and update normal matrix.
@@ -420,14 +410,23 @@ void drawScene(void)
 
     drawSky();
 
-    // Draw cylinder.
+    // Draw torus.
     modelViewMat = rotate(modelViewMat, float(PI /2), vec3(1.0, 0.0, 0.0));
-    modelViewMat = scale(modelViewMat, vec3(3.0, 3.0, 2.0));
-    //modelViewMat = translate(modelViewMat, vec3(0.0, 0.0, 60.0));
+    modelViewMat = scale(modelViewMat, vec3(0.5, 0.5, 0.5));
+    modelViewMat = translate(modelViewMat, vec3(0.0, -100.0, -2.0));
     glUniformMatrix4fv(modelViewMatLoc, 1, GL_FALSE, value_ptr(modelViewMat));
-    glUniform1ui(objectLoc, CYLINDER);
-    glBindVertexArray(vao[CYLINDER]);
-    glMultiDrawElements(GL_TRIANGLE_STRIP, cylCounts, GL_UNSIGNED_INT, (const void **)cylOffsets, CYL_LATS);
+
+    // Calculate and update normal matrix.
+    normalMat = transpose(inverse(mat3(modelViewMat)));
+    glUniformMatrix3fv(normalMatLoc, 1, GL_FALSE, value_ptr(normalMat));
+
+    glUniform1ui(objectLoc, TORUS);
+    glBindVertexArray(vao[TORUS]);
+    glMultiDrawElements(GL_TRIANGLE_STRIP, torCounts, GL_UNSIGNED_INT, (const void **)torOffsets, TOR_LATS);
+
+    modelViewMat = scale(modelViewMat, -vec3(0.5, 0.5, 0.5));
+    modelViewMat = translate(modelViewMat, -vec3(0.0, -100.0, -2.0));
+    modelViewMat = rotate(modelViewMat, -float(PI /2), vec3(1.0, 0.0, 0.0));
 
     glutSwapBuffers();
 }
@@ -459,7 +458,6 @@ void drawSky(void)
     glBindVertexArray(vao[CLOUD]);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    glBindVertexArray(0);
 }
 
 // OpenGL window reshape routine.
@@ -560,7 +558,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(width, height);
     glutInitWindowPosition(0,0);
-    glutCreateWindow("a field and a sky");
+    glutCreateWindow("Skybox and lighting");
     glutDisplayFunc(drawScene);
     glutReshapeFunc(resize);
     glutPassiveMotionFunc(mouse);

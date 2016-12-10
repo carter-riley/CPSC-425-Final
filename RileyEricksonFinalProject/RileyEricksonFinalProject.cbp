@@ -15,6 +15,7 @@
 					<Add option="-g" />
 					<Add directory="../../glm" />
 					<Add directory="../glm" />
+					<Add directory="U:/CPSC425/CPSC-425-Final/RileyEricksonFinalProject/" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -44,8 +45,7 @@
 			<Add library="gdi32" />
 			<Add directory="C:/MinGW/lib" />
 		</Linker>
-		<Unit filename="cylinder.cpp" />
-		<Unit filename="cylinder.h" />
+		<Unit filename="fragmentShader.glsl" />
 		<Unit filename="getbmp.cpp" />
 		<Unit filename="getbmp.h" />
 		<Unit filename="light.h" />
@@ -53,7 +53,12 @@
 		<Unit filename="material.h" />
 		<Unit filename="shader.cpp" />
 		<Unit filename="shader.h" />
+		<Unit filename="skybox.cpp" />
+		<Unit filename="skybox.h" />
+		<Unit filename="torus.cpp" />
+		<Unit filename="torus.h" />
 		<Unit filename="vertex.h" />
+		<Unit filename="vertexShader.glsl" />
 		<Extensions>
 			<code_completion />
 			<envvars />

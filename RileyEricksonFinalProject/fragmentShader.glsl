@@ -31,5 +31,6 @@ void main(void)
     if (object == 4) colorsOut = sky4TexColor;
     if (object == 5) colorsOut = cloudTexColor;
     if (object == 6) colorsOut = colsExport;
+//    if (object == 7) colorsOut = colsExport;
 
 }
